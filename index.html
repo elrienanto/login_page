@@ -1,19 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-TXNSN7C8');</script>
-<!-- End Google Tag Manager -->
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-TXNSN7C8');
+    </script>
+    <!-- End Google Tag Manager -->
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
-    
--weight: bold;
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-weight: bold;
+            color: #555;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
             color: #555;
         }
         input {
@@ -55,10 +86,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     </style>
 </head>
 <body>
-   <!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXNSN7C8"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXNSN7C8"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
 
     <div class="container">
         <h1>User Login</h1>
@@ -67,37 +100,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
             </div>
-            
             <div class="form-group">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" required>
             </div>
-            
             <div class="form-group">
                 <label for="phone">Phone:</label>
                 <input type="tel" id="phone" name="phone" required>
             </div>
-            
             <button type="submit" class="login-btn">Login</button>
         </form>
-        
         <button id="subscriptionBtn" class="subscription-btn" disabled>Go to Subscription</button>
     </div>
 
     <script>
         // Initialize dataLayer
         window.dataLayer = window.dataLayer || [];
-        
+
         let userData = {};
-        
+
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
             // Get form data
             const email = document.getElementById('email').value;
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
-            
+
             // Store user data
             userData = {
                 user_id: email,
@@ -105,7 +134,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 email: email,
                 phone: phone
             };
-            
+
             // Push logged_in event to dataLayer
             window.dataLayer.push({
                 event: 'logged_in',
@@ -114,20 +143,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 email: userData.email,
                 phone: userData.phone
             });
-            
+
             console.log('Logged in event fired:', userData);
-            
+
             // Enable subscription button
             document.getElementById('subscriptionBtn').disabled = false;
             document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
         });
-        
+
         document.getElementById('subscriptionBtn').addEventListener('click', function() {
             if (Object.keys(userData).length === 0) {
                 alert('Please login first!');
                 return;
             }
-            
+
             // Fire subscription_initiated event
             window.dataLayer.push({
                 event: 'subscription_initiated',
@@ -136,12 +165,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 email: userData.email,
                 phone: userData.phone
             });
-            
+
             console.log('Subscription initiated event fired');
-            
+
             // Store user data in sessionStorage for next page
             sessionStorage.setItem('userData', JSON.stringify(userData));
-            
+
             // Redirect to subscription page
             window.location.href = 'https://elrienanto.github.io/subscription.html';
         });
