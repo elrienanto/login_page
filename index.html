@@ -15,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
 
+    <!-- ✅ FIXED STYLE TAG -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,6 +24,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
         }
         .container {
             background-color: #fff;
@@ -122,12 +124,10 @@
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Get form data
             const email = document.getElementById('email').value;
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
 
-            // Store user data
             userData = {
                 user_id: email,
                 name: name,
@@ -135,7 +135,6 @@
                 phone: phone
             };
 
-            // Push logged_in event to dataLayer
             window.dataLayer.push({
                 event: 'logged_in',
                 user_id: userData.user_id,
@@ -146,7 +145,6 @@
 
             console.log('Logged in event fired:', userData);
 
-            // Enable subscription button
             document.getElementById('subscriptionBtn').disabled = false;
             document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
         });
@@ -157,7 +155,6 @@
                 return;
             }
 
-            // Fire subscription_initiated event
             window.dataLayer.push({
                 event: 'subscription_initiated',
                 user_id: userData.user_id,
@@ -168,10 +165,7 @@
 
             console.log('Subscription initiated event fired');
 
-            // Store user data in sessionStorage for next page
             sessionStorage.setItem('userData', JSON.stringify(userData));
-
-            // Redirect to subscription page
             window.location.href = 'https://elrienanto.github.io/subscription.html';
         });
     </script>
