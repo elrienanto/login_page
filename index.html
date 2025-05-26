@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+    <!-- End Google Tag Manager -->
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .login-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .login-btn:hover {
+            background-color: #0056b3;
+        }
+        .subscription-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .subscription-btn:hover {
+            background-color: #1e7e34;
+        }
+        .subscription-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <div class="container">
+        <h1>User Login</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        
+        <button id="subscriptionBtn" class="subscription-btn" disabled>Go to Subscription</button>
+    </div>
+
+    <script>
+        // Initialize dataLayer
+        window.dataLayer = window.dataLayer || [];
+        
+        let userData = {};
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            
+            // Store user data
+            userData = {
+                user_id: email,
+                name: name,
+                email: email,
+                phone: phone
+            };
+            
+            // Push logged_in event to dataLayer
+            window.dataLayer.push({
+                event: 'logged_in',
+                user_id: userData.user_id,
+                name: userData.name,
+                email: userData.email,
+                phone: userData.phone
+            });
+            
+            console.log('Logged in event fired:', userData);
+            
+            // Enable subscription button
+            document.getElementById('subscriptionBtn').disabled = false;
+            document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
+        });
+        
+        document.getElementById('subscriptionBtn').addEventListener('click', function() {
+            if (Object.keys(userData).length === 0) {
+                alert('Please login first!');
+                return;
+            }
+            
+            // Fire subscription_initiated event
+            window.dataLayer.push({
+                event: 'subscription_initiated',
+                user_id: userData.user_id,
+                name: userData.name,
+                email: userData.email,
+                phone: userData.phone
+            });
+            
+            console.log('Subscription initiated event fired');
+            
+            // Store user data in sessionStorage for next page
+            sessionStorage.setItem('userData', JSON.stringify(userData));
+            
+            // Redirect to subscription page
+            window.location.href = 'subscription.html';
+        });
+    </script>
+</body>
+</html>
