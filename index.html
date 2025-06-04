@@ -116,11 +116,62 @@
     </div>
 
     <script>
-    // Initialize dataLayer
     window.dataLayer = window.dataLayer || [];
-
     let userData = {};
 
+    // Load from localStorage on page load
+    window.addEventListener('load', () => {
+        const storedData = localStorage.getItem('userLoginData');
+
+        if (storedData) {
+            try {
+                userData = JSON.parse(storedData);
+
+                const webengageReady = () => {
+                    const weCookie = webengage?.util?.getWebengageCookie();
+                    const weCuid = weCookie?.cuid || null;
+
+                    if (weCuid) {
+                        console.log('WebEngage CUID found:', weCuid);
+                        // Don't push to dataLayer; already logged in
+                    } else {
+                        console.log('No CUID found. Logging in to WebEngage...');
+
+                        // // Sync to WebEngage
+                        // webengage.user.login(userData.user_id);
+                        // webengage.user.setAttribute('name', userData.name);
+                        // webengage.user.setAttribute('email', userData.email);
+                        // webengage.user.setAttribute('phone', userData.phone);
+
+                        // Push to dataLayer
+                        window.dataLayer.push({
+                            event: 'logged_in',
+                            ...userData
+                        });
+
+                        console.log('Logged in event fired from localStorage (no CUID)');
+                    }
+
+                    // Enable subscription button
+                    document.getElementById('subscriptionBtn').disabled = false;
+                    document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
+                };
+
+                // Ensure WebEngage is loaded
+                if (window.webengage?.util?.getWebengageCookie) {
+                    webengageReady();
+                } else {
+                    // If not yet loaded, wait a bit
+                    setTimeout(webengageReady, 1000);
+                }
+
+            } catch (err) {
+                console.warn('Invalid user data in localStorage:', err);
+            }
+        }
+    });
+
+    // Manual login
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -135,75 +186,45 @@
             phone: phone
         };
 
-        // Push to GTM dataLayer
+        localStorage.setItem('userLoginData', JSON.stringify(userData));
+
+        // Sync to WebEngage
+        if (window.webengage) {
+            webengage.user.login(userData.user_id);
+            webengage.user.setAttribute('name', userData.name);
+            webengage.user.setAttribute('email', userData.email);
+            webengage.user.setAttribute('phone', userData.phone);
+        }
+
+        // Push to GTM
         window.dataLayer.push({
             event: 'logged_in',
             ...userData
         });
 
-        console.log('Logged in event fired:', userData);
-
-        // Store in localStorage
-        localStorage.setItem('userLoginData', JSON.stringify(userData));
+        console.log('User manually logged in:', userData);
 
         document.getElementById('subscriptionBtn').disabled = false;
         document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
     });
 
+    // Subscription
     document.getElementById('subscriptionBtn').addEventListener('click', function() {
-        // Load from localStorage if empty
-        if (Object.keys(userData).length === 0) {
-            const storedData = localStorage.getItem('userLoginData');
-            if (storedData) {
-                try {
-                    userData = JSON.parse(storedData);
-                } catch (err) {
-                    console.warn('Invalid localStorage data');
-                }
-            }
-        }
-
         if (!userData.user_id) {
             alert('Please login first!');
             return;
         }
 
-        // Push subscription event to dataLayer
         window.dataLayer.push({
             event: 'subscription_initiated',
             ...userData
         });
 
-        console.log('Subscription initiated event fired');
-
         sessionStorage.setItem('userData', JSON.stringify(userData));
         window.location.href = 'https://elrienanto.github.io/subscription_page';
     });
-
-    // 📌 WebEngage Cookie Checker
-    function checkWebEngageCookie() {
-        try {
-            const weCookie = webengage?.util?.getWebengageCookie();
-            if (weCookie && weCookie.cuid) {
-                console.log('WebEngage CUID found:', weCookie.cuid);
-
-                window.dataLayer.push({
-                    event: 'webengage_user_identified',
-                    we_cuid: weCookie.cuid
-                });
-            } else {
-                console.log('WebEngage CUID not found');
-            }
-        } catch (error) {
-            console.error('Error checking WebEngage cookie:', error);
-        }
-    }
-
-    // Run the check after page load and give time for WebEngage to initialize
-    window.addEventListener('load', () => {
-        setTimeout(checkWebEngageCookie, 1500); // Delay may be needed for WebEngage to load
-    });
 </script>
+
 
 
 </body>
