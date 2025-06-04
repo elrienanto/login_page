@@ -188,13 +188,13 @@
 
         localStorage.setItem('userLoginData', JSON.stringify(userData));
 
-        // Sync to WebEngage
-        if (window.webengage) {
-            webengage.user.login(userData.user_id);
-            webengage.user.setAttribute('name', userData.name);
-            webengage.user.setAttribute('email', userData.email);
-            webengage.user.setAttribute('phone', userData.phone);
-        }
+        // // Sync to WebEngage
+        // if (window.webengage) {
+        //     webengage.user.login(userData.user_id);
+        //     webengage.user.setAttribute('name', userData.name);
+        //     webengage.user.setAttribute('email', userData.email);
+        //     webengage.user.setAttribute('phone', userData.phone);
+        // }
 
         // Push to GTM
         window.dataLayer.push({
