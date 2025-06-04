@@ -137,11 +137,7 @@
                     } else {
                         console.log('No CUID found. Logging in to WebEngage...');
 
-                        // // Sync to WebEngage
-                        // webengage.user.login(userData.user_id);
-                        // webengage.user.setAttribute('name', userData.name);
-                        // webengage.user.setAttribute('email', userData.email);
-                        // webengage.user.setAttribute('phone', userData.phone);
+                      
 
                         // Push to dataLayer
                         window.dataLayer.push({
@@ -188,14 +184,7 @@
 
         localStorage.setItem('userLoginData', JSON.stringify(userData));
 
-        // // Sync to WebEngage
-        // if (window.webengage) {
-        //     webengage.user.login(userData.user_id);
-        //     webengage.user.setAttribute('name', userData.name);
-        //     webengage.user.setAttribute('email', userData.email);
-        //     webengage.user.setAttribute('phone', userData.phone);
-        // }
-
+       
         // Push to GTM
         window.dataLayer.push({
             event: 'logged_in',
