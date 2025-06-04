@@ -1,173 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Google Tag Manager -->
-    <script>
-        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-        })(window,document,'script','dataLayer','GTM-TXNSN7C8');
-    </script>
-    <!-- End Google Tag Manager -->
+<script>
+    // Initialize dataLayer
+    window.dataLayer = window.dataLayer || [];
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    let userData = {};
 
-    <!-- ✅ FIXED STYLE TAG -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 24px;
-            font-weight: bold;
-            color: #555;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            color: #555;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .login-btn {
-            background-color: #007bff;
-            color: white;
-        }
-        .login-btn:hover {
-            background-color: #0056b3;
-        }
-        .subscription-btn {
-            background-color: #28a745;
-            color: white;
-        }
-        .subscription-btn:hover {
-            background-color: #1e7e34;
-        }
-        .subscription-btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-    </style>
-</head>
-<body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript>
-        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TXNSN7C8"
-        height="0" width="0" style="display:none;visibility:hidden"></iframe>
-    </noscript>
-    <!-- End Google Tag Manager (noscript) -->
+    function setCookie(name, value, days) {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+    }
 
-    <div class="container">
-        <h1>User Login</h1>
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="phone">Phone:</label>
-                <input type="tel" id="phone" name="phone" required>
-            </div>
-            <button type="submit" class="login-btn">Login</button>
-        </form>
-        <button id="subscriptionBtn" class="subscription-btn" disabled>Go to Subscription</button>
-    </div>
+    function getCookie(name) {
+        return document.cookie.split('; ').reduce((r, v) => {
+            const parts = v.split('=');
+            return parts[0] === name ? decodeURIComponent(parts[1]) : r
+        }, '');
+    }
 
-    <script>
-        // Initialize dataLayer
-        window.dataLayer = window.dataLayer || [];
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
 
-        let userData = {};
+        const email = document.getElementById('email').value;
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        userData = {
+            user_id: email,
+            name: name,
+            email: email,
+            phone: phone
+        };
 
-            const email = document.getElementById('email').value;
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-
-            userData = {
-                user_id: email,
-                name: name,
-                email: email,
-                phone: phone
-            };
-
-            window.dataLayer.push({
-                event: 'logged_in',
-                user_id: userData.user_id,
-                name: userData.name,
-                email: userData.email,
-                phone: userData.phone
-            });
-
-            console.log('Logged in event fired:', userData);
-
-            document.getElementById('subscriptionBtn').disabled = false;
-            document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
+        // Push to GTM dataLayer
+        window.dataLayer.push({
+            event: 'logged_in',
+            ...userData
         });
 
-        document.getElementById('subscriptionBtn').addEventListener('click', function() {
-            if (Object.keys(userData).length === 0) {
-                alert('Please login first!');
-                return;
+        console.log('Logged in event fired:', userData);
+
+        // Store user data in cookies for persistence
+        setCookie('userLoginData', JSON.stringify(userData), 7);
+
+        document.getElementById('subscriptionBtn').disabled = false;
+        document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
+    });
+
+    document.getElementById('subscriptionBtn').addEventListener('click', function() {
+        if (Object.keys(userData).length === 0) {
+            const cookieData = getCookie('userLoginData');
+            if (cookieData) {
+                try {
+                    userData = JSON.parse(cookieData);
+                } catch (err) {
+                    console.warn('Invalid cookie data');
+                }
             }
+        }
 
-            window.dataLayer.push({
-                event: 'subscription_initiated',
-                user_id: userData.user_id,
-                name: userData.name,
-                email: userData.email,
-                phone: userData.phone
-            });
+        if (!userData.user_id) {
+            alert('Please login first!');
+            return;
+        }
 
-            console.log('Subscription initiated event fired');
-
-            sessionStorage.setItem('userData', JSON.stringify(userData));
-            window.location.href = 'https://elrienanto.github.io/subscription_page';
+        // Push subscription event to dataLayer
+        window.dataLayer.push({
+            event: 'subscription_initiated',
+            ...userData
         });
-    </script>
-</body>
-</html>
+
+        console.log('Subscription initiated event fired');
+
+        sessionStorage.setItem('userData', JSON.stringify(userData));
+        window.location.href = 'https://elrienanto.github.io/subscription_page';
+    });
+
+    // // 📌 Placeholder: WebEngage Cookie Integration
+    // function checkWebEngageCookie() {
+    //     const weUserId = getCookie('_we_wk'); // Replace with actual cookie key used by WebEngage
+    //     if (weUserId) {
+    //         console.log('WebEngage cookie found:', weUserId);
+    //         // You can map it to userData or fire another GTM event here
+    //     } else {
+    //         console.log('WebEngage cookie not found');
+    //     }
+    // }
+
+    // Call this on load or after WebEngage loads
+    window.addEventListener('load', checkWebEngageCookie);
+</script>
