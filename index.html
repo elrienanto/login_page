@@ -121,18 +121,6 @@
 
     let userData = {};
 
-    function setCookie(name, value, days) {
-        const expires = new Date(Date.now() + days * 864e5).toUTCString();
-        document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
-    }
-
-    function getCookie(name) {
-        return document.cookie.split('; ').reduce((r, v) => {
-            const parts = v.split('=');
-            return parts[0] === name ? decodeURIComponent(parts[1]) : r
-        }, '');
-    }
-
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -155,21 +143,22 @@
 
         console.log('Logged in event fired:', userData);
 
-        // Store user data in cookies for persistence
-        setCookie('userLoginData', JSON.stringify(userData), 7);
+        // Store in localStorage
+        localStorage.setItem('userLoginData', JSON.stringify(userData));
 
         document.getElementById('subscriptionBtn').disabled = false;
         document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
     });
 
     document.getElementById('subscriptionBtn').addEventListener('click', function() {
+        // Load from localStorage if empty
         if (Object.keys(userData).length === 0) {
-            const cookieData = getCookie('userLoginData');
-            if (cookieData) {
+            const storedData = localStorage.getItem('userLoginData');
+            if (storedData) {
                 try {
-                    userData = JSON.parse(cookieData);
+                    userData = JSON.parse(storedData);
                 } catch (err) {
-                    console.warn('Invalid cookie data');
+                    console.warn('Invalid localStorage data');
                 }
             }
         }
@@ -191,20 +180,31 @@
         window.location.href = 'https://elrienanto.github.io/subscription_page';
     });
 
-    // 📌 Placeholder: WebEngage Cookie Integration
+    // 📌 WebEngage Cookie Checker
     function checkWebEngageCookie() {
-        const weUserId = getCookie('_we_wk'); // Replace with actual cookie key used by WebEngage
-        if (weUserId) {
-            console.log('WebEngage cookie found:', weUserId);
-            // You can map it to userData or fire another GTM event here
-        } else {
-            console.log('WebEngage cookie not found');
+        try {
+            const weCookie = webengage?.util?.getWebengageCookie();
+            if (weCookie && weCookie.cuid) {
+                console.log('WebEngage CUID found:', weCookie.cuid);
+
+                window.dataLayer.push({
+                    event: 'webengage_user_identified',
+                    we_cuid: weCookie.cuid
+                });
+            } else {
+                console.log('WebEngage CUID not found');
+            }
+        } catch (error) {
+            console.error('Error checking WebEngage cookie:', error);
         }
     }
 
-    // Call this on load or after WebEngage loads
-    window.addEventListener('load', checkWebEngageCookie);
+    // Run the check after page load and give time for WebEngage to initialize
+    window.addEventListener('load', () => {
+        setTimeout(checkWebEngageCookie, 1500); // Delay may be needed for WebEngage to load
+    });
 </script>
+
 
 </body>
 </html>
