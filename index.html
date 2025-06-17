@@ -1,14 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Tag Manager -->
+    <!-- Nuxt-style GTM Config Injection -->
     <script>
+        window.__NUXT__ = window.__NUXT__ || {};
+        window.__NUXT__.config = window.__NUXT__.config || {};
+        window.__NUXT__.config.public = {
+            scripts: {
+                googleTagManager: {
+                    id: "GTM-TXNSN7C8"
+                }
+            },
+            gtag: {
+                enabled: true,
+                initMode: "auto",
+                id: "GTM-TXNSN7C8",
+                initCommands: [
+                    ["consent", "default", { wait_for_updated: 2000 }]
+                ],
+                config: {},
+                tags: [],
+                loadingStrategy: "defer",
+                url: "https://www.googletagmanager.com/gtag/js"
+            }
+        };
+    </script>
+
+    <!-- Google Tag Manager -->
+<!--     <script>
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
         new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
         })(window,document,'script','dataLayer','GTM-TXNSN7C8');
-    </script>
+    </script> -->
     <!-- End Google Tag Manager -->
 
     <meta charset="UTF-8">
@@ -116,105 +141,94 @@
     </div>
 
     <script>
-    window.dataLayer = window.dataLayer || [];
-    let userData = {};
+        window.dataLayer = window.dataLayer || [];
+        let userData = {};
 
-    // Load from localStorage on page load
-    window.addEventListener('load', () => {
-        const storedData = localStorage.getItem('userLoginData');
+        // Load from localStorage on page load
+        window.addEventListener('load', () => {
+            const storedData = localStorage.getItem('userLoginData');
 
-        if (storedData) {
-            try {
-                userData = JSON.parse(storedData);
+            if (storedData) {
+                try {
+                    userData = JSON.parse(storedData);
 
-                const webengageReady = () => {
-                    const weCookie = webengage?.util?.getWebengageCookie();
-                    const weCuid = weCookie?.cuid || null;
+                    const webengageReady = () => {
+                        const weCookie = webengage?.util?.getWebengageCookie();
+                        const weCuid = weCookie?.cuid || null;
 
-                    if (weCuid) {
-                        console.log('WebEngage CUID found:', weCuid);
-                        // Don't push to dataLayer; already logged in
+                        if (weCuid) {
+                            console.log('WebEngage CUID found:', weCuid);
+                            // Already logged in, do nothing
+                        } else {
+                            console.log('No CUID found. Logging in to WebEngage...');
+
+                            window.dataLayer.push({
+                                event: 'logged_in',
+                                ...userData
+                            });
+
+                            console.log('Logged in event fired from localStorage (no CUID)');
+                        }
+
+                        document.getElementById('subscriptionBtn').disabled = false;
+                        document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
+                    };
+
+                    if (window.webengage?.util?.getWebengageCookie) {
+                        webengageReady();
                     } else {
-                        console.log('No CUID found. Logging in to WebEngage...');
-
-                      
-
-                        // Push to dataLayer
-                        window.dataLayer.push({
-                            event: 'logged_in',
-                            ...userData
-                        });
-
-                        console.log('Logged in event fired from localStorage (no CUID)');
+                        setTimeout(webengageReady, 1000);
                     }
 
-                    // Enable subscription button
-                    document.getElementById('subscriptionBtn').disabled = false;
-                    document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
-                };
-
-                // Ensure WebEngage is loaded
-                if (window.webengage?.util?.getWebengageCookie) {
-                    webengageReady();
-                } else {
-                    // If not yet loaded, wait a bit
-                    setTimeout(webengageReady, 1000);
+                } catch (err) {
+                    console.warn('Invalid user data in localStorage:', err);
                 }
-
-            } catch (err) {
-                console.warn('Invalid user data in localStorage:', err);
             }
-        }
-    });
-
-    // Manual login
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const email = document.getElementById('email').value;
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-
-        userData = {
-            user_id: email,
-            name: name,
-            email: email,
-            phone: phone
-        };
-
-        localStorage.setItem('userLoginData', JSON.stringify(userData));
-
-       
-        // Push to GTM
-        window.dataLayer.push({
-            event: 'logged_in',
-            ...userData
         });
 
-        console.log('User manually logged in:', userData);
+        // Manual login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-        document.getElementById('subscriptionBtn').disabled = false;
-        document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
-    });
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
 
-    // Subscription
-    document.getElementById('subscriptionBtn').addEventListener('click', function() {
-        if (!userData.user_id) {
-            alert('Please login first!');
-            return;
-        }
+            userData = {
+                user_id: email,
+                name: name,
+                email: email,
+                phone: phone
+            };
 
-        window.dataLayer.push({
-            event: 'subscription_initiated',
-            ...userData
+            localStorage.setItem('userLoginData', JSON.stringify(userData));
+
+            window.dataLayer.push({
+                event: 'logged_in',
+                ...userData
+            });
+
+            console.log('User manually logged in:', userData);
+
+            document.getElementById('subscriptionBtn').disabled = false;
+            document.getElementById('subscriptionBtn').textContent = 'Go to Subscription';
         });
 
-        sessionStorage.setItem('userData', JSON.stringify(userData));
-        window.location.href = 'https://elrienanto.github.io/subscription_page';
-    });
-</script>
+        // Subscription
+        document.getElementById('subscriptionBtn').addEventListener('click', function() {
+            if (!userData.user_id) {
+                alert('Please login first!');
+                return;
+            }
 
+            window.dataLayer.push({
+                event: 'subscription_initiated',
+                ...userData
+            });
 
-
+            sessionStorage.setItem('userData', JSON.stringify(userData));
+            window.location.href = 'https://elrienanto.github.io/subscription_page';
+        });
+    </script>
 </body>
 </html>
