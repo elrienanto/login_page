@@ -4,57 +4,41 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Your Brand — Landing</title>
-  <meta name="description" content="Simple landing page with direct WebEngage SDK integration." />
   <style>
-    :root{
-      --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e2e8f0; --accent:#60a5fa; --accent2:#34d399; --border:#1f2937;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#0b1220, #0b1220 40%, #0d1426 100%);color:var(--text)}
+    :root{--bg:#0b1220;--border:#1f2937;--text:#e2e8f0;--muted:#94a3b8;--accent:#60a5fa;}
+    *{box-sizing:border-box} body{margin:0;background:#0b1220;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     a{color:inherit;text-decoration:none}
     .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{
-      position:sticky;top:0;backdrop-filter:saturate(120%) blur(6px);
-      background:rgba(10,15,26,.7);border-bottom:1px solid var(--border);z-index:10
-    }
+    header{position:sticky;top:0;background:rgba(10,15,26,.7);backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid var(--border)}
     nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{font-weight:700;letter-spacing:.2px}
-    .menu{display:flex;gap:16px;flex-wrap:wrap}
-    .menu a{padding:10px 12px;border-radius:10px;color:var(--muted)}
-    .menu a:hover{background:#11192d;color:#e5ecf7}
-    .pill{font-size:12px;border:1px solid #223; padding:4px 8px;border-radius:999px;color:#bcd}
-    .hero{padding:60px 0 24px}
-    .hero h1{margin:0 0 12px;font-size:36px;line-height:1.1}
-    .hero p{margin:0;color:var(--muted)}
-    .status{margin-top:18px;display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border:1px dashed #20304f;border-radius:10px;color:#cfe}
+    .brand{font-weight:700} .menu{display:flex;gap:16px;flex-wrap:wrap}
+    .menu a{padding:10px 12px;border-radius:10px;color:var(--muted)} .menu a:hover{background:#11192d;color:#e5ecf7}
+    .hero{padding:56px 0 20px} .hero h1{margin:0 0 10px;font-size:36px} .hero p{margin:0;color:var(--muted)}
+    .status{margin-top:16px;display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border:1px dashed #20304f;border-radius:10px}
     .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
     .card{background:linear-gradient(180deg,#0f172a,#0c1427);border:1px solid var(--border);border-radius:16px;padding:18px}
-    .card h3{margin:0 0 6px;font-size:16px}
-    .card p{margin:0;color:var(--muted);font-size:14px}
-    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .card h3{margin:0 0 6px;font-size:16px} .card p{margin:0;color:var(--muted);font-size:14px}
     .btn{border:none;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:600}
     .btn-primary{background:var(--accent);color:#08101f}
-    .btn-ghost{background:#11192d;color:#cfe;border:1px solid #243047}
     footer{border-top:1px solid var(--border);margin-top:30px;padding:20px 0;color:var(--muted);font-size:14px}
     @media (max-width:900px){ .grid{grid-template-columns:1fr} .hero{padding-top:36px} }
   </style>
 
-  <!-- WebEngage SDK (direct, no GTM) -->
+  <!-- WebEngage SDK (modern CDN) -->
   <script>
-    (function(w, d) {
-      w.webengage = w.webengage || {};
-      w.webengage._q = w.webengage._q || [];
-      var methods = ["init","user","track","onReady","options"];
-      for (var i = 0; i < methods.length; i++) {
-        (function(m){ w.webengage[m] = w.webengage[m] || function(){ w.webengage._q.push([m].concat([].slice.call(arguments))); }; })(methods[i]);
-      }
-      var s = d.createElement("script");
-      s.async = true;
-      s.src = "https://cdn.webengage.com/js/webengage-min-v-6.0.js";
-      d.head.appendChild(s);
-      // Initialize with your Site ID
-      w.webengage.init("76abaa9");
-    })(window, document);
+    var webengage;
+    !function(w,e,b,n,g){function o(e,t){e[t[t.length-1]]=function(){r.__queue.push([t.join("."),arguments])}}
+    var i,s,r=w[e],z=" ",l="init options user login logout setAttribute setAttributeOnce setAttributes setAttributesOnce track screen onReady".split(z);
+    if(r) return; i=function(){this.__queue=[];},s={}; r=w[e]=new i;
+    for(var a=0;a<l.length;a++) o(s,l[a].split(z));
+    r.__api=s; r.__queue=[]; r.__version="6.0"; r.__loaded=!1;
+    var d=document.createElement("script"); d.type="text/javascript"; d.async=!0;
+    d.src="https://cdn.webengage.com/v3/webengage-min.js";
+    var n0=document.getElementsByTagName("script")[0]; n0.parentNode.insertBefore(d,n0);
+    r.__init_time=(new Date).getTime();
+  }(window,"webengage");
+
+  webengage.init("76abaa9"); /* <-- keep your real Site ID */
   </script>
 </head>
 
@@ -62,9 +46,8 @@
   <header>
     <div class="wrap">
       <nav>
-        <div class="brand">YourBrand <span class="pill">Landing</span></div>
-        <div class="menu" id="navMenu">
-          <!-- Personalization hooks: data-slot & ids you can target later -->
+        <div class="brand">YourBrand</div>
+        <div class="menu">
           <a id="nav-home" data-slot="nav_home" href="/">Home</a>
           <a id="nav-product" data-slot="nav_product" href="/product">Product</a>
           <a id="nav-about" data-slot="nav_about" href="/about">About Us</a>
@@ -79,117 +62,69 @@
     <section class="hero">
       <h1>Make your journey personal.</h1>
       <p id="heroCopy" data-slot="hero_copy">
-        We’ll recognize you automatically if your email link includes a user ID. Otherwise, browse anonymously.
+        We’ll identify you **only** if your link includes a user ID.
       </p>
       <div class="status" id="statusBox" aria-live="polite">
         <strong id="statusBadge">Checking…</strong>
         <span id="statusText">Looking for <code>?uid=</code> or <code>?user_id=</code> in the URL.</span>
       </div>
-
-      <div class="cta">
+      <div style="margin-top:14px;">
         <button id="goSub" class="btn btn-primary" type="button">Go to Subscription</button>
-        <button id="learnMore" class="btn btn-ghost" type="button">Learn More</button>
       </div>
     </section>
 
     <section class="grid" aria-label="Highlights">
       <article class="card" data-slot="card_one">
-        <h3>Fast setup</h3>
-        <p>Drop-in SDK + tokenized links. Identify known users in seconds.</p>
+        <h3>Fast setup</h3><p>Drop-in SDK + tokenized links.</p>
       </article>
       <article class="card" data-slot="card_two">
-        <h3>Smart personalization</h3>
-        <p>Target banners, headers, and CTAs using attributes & events.</p>
+        <h3>Smart personalization</h3><p>Target banners and nav via segments.</p>
       </article>
       <article class="card" data-slot="card_three">
-        <h3>Clean attribution</h3>
-        <p>Carry UTM and user context across pages for end-to-end reporting.</p>
+        <h3>Clean attribution</h3><p>Carry UTM + uid across pages.</p>
       </article>
     </section>
   </main>
 
-  <footer>
-    <div class="wrap">© <span id="y"></span> YourBrand. Built for speed & personalization.</div>
-  </footer>
+  <footer><div class="wrap">© <span id="y"></span> YourBrand.</div></footer>
 
   <script>
-    // ---------- Utilities ----------
-    const $ = (sel) => document.querySelector(sel);
+    // --- query params & helpers ---
     const params = new URLSearchParams(location.search);
     const uid = params.get("uid") || params.get("user_id") || null;
+    const setStatus = (b,t)=>{ document.getElementById('statusBadge').textContent=b; document.getElementById('statusText').textContent=t; };
 
-    function setStatus(badge, text){
-      $("#statusBadge").textContent = badge;
-      $("#statusText").textContent = text;
-    }
-
-    // Carry all current query params to your subscription page
-    function goToSubscription() {
-      const dest = new URL("https://elrienanto.github.io/subscription_page");
-      dest.search = params.toString(); // keep UTMs + uid if present
-      if (window.webengage && typeof webengage.track === "function") {
-        webengage.track("Subscription CTA Clicked", { uid: uid || null, path: location.pathname });
-      }
-      location.href = dest.toString();
-    }
-
-    // Example secondary CTA
-    function learnMore() {
-      if (window.webengage && typeof webengage.track === "function") {
-        webengage.track("Learn More Clicked", { uid: uid || null });
-      }
-      alert("This is placeholder content. You can replace it or route to /about.");
-    }
-
-    // ---------- WebEngage Identify (only if uid exists) ----------
-    // Runs after SDK is ready. If uid not present, do nothing.
-    webengage.onReady(function() {
+    // Identify only if uid exists
+    webengage.onReady(function(){
       if (!uid) {
-        setStatus("Anonymous", "No user ID in URL. Staying anonymous.");
-        // Helpful GTM-style debug (optional)
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "we_login_skipped", reason: "no_uid_param" });
+        setStatus("Anonymous","No user ID in URL. Skipping WebEngage login.");
         return;
       }
-
       try {
-        // Log in to convert to known user
         webengage.user.login(uid);
 
-        // (Optional) attach UTMs as user attributes for downstream targeting
-        ["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(k => {
-          const v = params.get(k);
-          if (v) try { webengage.user.setAttribute(k, v); } catch(e){}
+        // (Optional) attach UTM params as user attributes
+        ["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(k=>{
+          const v=params.get(k); if(v) try{ webengage.user.setAttribute(k,v); }catch(e){}
         });
 
-        // (Optional) track arrival
         try { webengage.track("Email Clickthrough", { uid, path: location.pathname }); } catch(e){}
-
-        setStatus("Identified", `Logged in as "${uid}". Personalization rules can apply now.`);
+        setStatus("Identified", `Logged in as "${uid}".`);
       } catch (e) {
-        setStatus("Anonymous", "Tried to log in but SDK threw an error.");
-        (window.dataLayer = window.dataLayer || []).push({ event: "we_login_error", message: e?.message || String(e) });
+        setStatus("Anonymous","Tried to log in but SDK errored.");
+        console.warn("WebEngage login error:", e);
       }
     });
 
-    // ---------- Wire up UI ----------
-    $("#goSub").addEventListener("click", goToSubscription);
-    $("#learnMore").addEventListener("click", learnMore);
-    $("#y").textContent = new Date().getFullYear();
-
-    // ---------- Personalization hooks (optional examples) ----------
-    // You can later modify headers with WebEngage Web Personalization or inline JS after identification.
-    // Example (inline, segment-flag simulated):
-    /*
-    webengage.onReady(function(){
-      const isVIP = true; // replace with your segment check or we attribute
-      if (isVIP) {
-        const el = document.getElementById("nav-product");
-        el.textContent = "VIP Products";
-        el.href = "/product?vip=1";
-      }
+    // Carry params to subscription page
+    document.getElementById("goSub").addEventListener("click", ()=>{
+      const dest = new URL("https://elrienanto.github.io/subscription_page");
+      dest.search = params.toString();
+      try { webengage.track("Subscription CTA Clicked", { uid: uid || null }); } catch(e){}
+      location.href = dest.toString();
     });
-    */
+
+    document.getElementById("y").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
