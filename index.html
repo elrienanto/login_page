@@ -31,46 +31,10 @@
   </style>
 
   <!-- Resilient WebEngage loader: stubs + multi-CDN fallback -->
-  <script>
-  (function (w, d) {
-    var we = w.webengage || {};
-    var q  = we._q = we._q || [];
-
-    // Top-level stubs so calls don't crash before SDK loads
-    ["init","onReady","track","options","screen"].forEach(function (m) {
-      we[m] = we[m] || function () { q.push([m].concat([].slice.call(arguments))); };
-    });
-
-    // User API stubs
-    we.user = we.user || {};
-    ["identify","login","logout","setAttribute","setAttributes","setAttributeOnce","setAttributesOnce"]
-      .forEach(function (m) {
-        we.user[m] = we.user[m] || function () { q.push(["user."+m].concat([].slice.call(arguments))); };
-      });
-
-    // Publish stub
-    w.webengage = we;
-
-    // Multi-CDN fallback (tries next host on error)
-    var hosts = [
-      "https://a-cdn.webengage.com/v3/webengage-min.js",
-      "https://cdn.webengage.com/v3/webengage-min.js",
-      "https://ssl.widgets.webengage.com/js/webengage-min-v-6.0.js" // legacy
-    ];
-    function loadNext(i) {
-      if (i >= hosts.length) return;
-      var s = d.createElement("script");
-      s.async = true;
-      s.src = hosts[i];
-      s.onerror = function () { loadNext(i + 1); };
-      d.head.appendChild(s);
-    }
-    loadNext(0);
-
-    // Queue init safely (do not call directly)
-    q.push(["init", "76abaa9"]); // <-- your real Site ID (already set)
-  })(window, document);
-  </script>
+  <script id='_webengage_script_tag' type='text/javascript'>
+                                    var webengage;!function(w,e,b,n,g){function o(e,t){e[t[t.length-1]]=function(){r.__queue.push([t.join("."),
+                                    arguments])}}var i,s,r=w[b],z=" ",l="init options track screen onReady".split(z),a="webPersonalization feedback survey notification notificationInbox".split(z),c="options render clear abort".split(z),p="Prepare Render Open Close Submit Complete View Click".split(z),u="identify login logout setAttribute".split(z);if(!r||!r.__v){for(w[b]=r={__queue:[],__v:"6.0",user:{}},i=0;i < l.length;i++)o(r,[l[i]]);for(i=0;i < a.length;i++){for(r[a[i]]={},s=0;s < c.length;s++)o(r[a[i]],[a[i],c[s]]);for(s=0;s < p.length;s++)o(r[a[i]],[a[i],"on"+p[s]])}for(i=0;i < u.length;i++)o(r.user,["user",u[i]]);setTimeout(function(){var f=e.createElement("script"),d=e.getElementById("_webengage_script_tag");f.type="text/javascript",f.async=!0,f.src=("https:"==e.location.protocol?"https://ssl.widgets.webengage.com":"http://cdn.widgets.webengage.com")+"/js/webengage-min-v-6.0.js",d.parentNode.insertBefore(f,d)})}}(window,document,"webengage");webengage.init("76abaa9");
+                                    </script>
 </head>
 
 <body>
