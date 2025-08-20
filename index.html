@@ -2,67 +2,75 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Your Brand — Landing</title>
+  <meta name="description" content="Simple landing page with direct WebEngage SDK integration and UID-based identification." />
   <style>
     :root{--bg:#0b1220;--border:#1f2937;--text:#e2e8f0;--muted:#94a3b8;--accent:#60a5fa;}
     *{box-sizing:border-box} body{margin:0;background:#0b1220;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
     a{color:inherit;text-decoration:none}
     .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{position:sticky;top:0;background:rgba(10,15,26,.7);backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid var(--border)}
+    header{position:sticky;top:0;background:rgba(10,15,26,.7);backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid var(--border);z-index:10}
     nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{font-weight:700} .menu{display:flex;gap:16px;flex-wrap:wrap}
-    .menu a{padding:10px 12px;border-radius:10px;color:var(--muted)} .menu a:hover{background:#11192d;color:#e5ecf7}
-    .hero{padding:56px 0 20px} .hero h1{margin:0 0 10px;font-size:36px} .hero p{margin:0;color:var(--muted)}
+    .brand{font-weight:700}
+    .menu{display:flex;gap:16px;flex-wrap:wrap}
+    .menu a{padding:10px 12px;border-radius:10px;color:var(--muted)}
+    .menu a:hover{background:#11192d;color:#e5ecf7}
+    .hero{padding:56px 0 20px}
+    .hero h1{margin:0 0 10px;font-size:36px}
+    .hero p{margin:0;color:var(--muted)}
     .status{margin-top:16px;display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border:1px dashed #20304f;border-radius:10px}
     .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
     .card{background:linear-gradient(180deg,#0f172a,#0c1427);border:1px solid var(--border);border-radius:16px;padding:18px}
-    .card h3{margin:0 0 6px;font-size:16px} .card p{margin:0;color:var(--muted);font-size:14px}
+    .card h3{margin:0 0 6px;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:14px}
     .btn{border:none;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:600}
     .btn-primary{background:var(--accent);color:#08101f}
     footer{border-top:1px solid var(--border);margin-top:30px;padding:20px 0;color:var(--muted);font-size:14px}
     @media (max-width:900px){ .grid{grid-template-columns:1fr} .hero{padding-top:36px} }
   </style>
 
-  <!-- WebEngage SDK (modern CDN) -->
- <script>
-  // Minimal, robust WebEngage loader (creates methods before network load)
-  (function(w,d){
-    w.webengage = w.webengage || {};
-    w.webengage._q = w.webengage._q || [];
+  <!-- Resilient WebEngage loader: stubs + multi-CDN fallback -->
+  <script>
+  (function (w, d) {
+    var we = w.webengage || {};
+    var q  = we._q = we._q || [];
 
-    // top-level methods
-    var methods = ["init","onReady","track","options","screen"];
-    for (var i=0;i<methods.length;i++){
-      (function(m){
-        w.webengage[m] = w.webengage[m] || function(){
-          w.webengage._q.push([m].concat([].slice.call(arguments)));
-        };
-      })(methods[i]);
+    // Top-level stubs so calls don't crash before SDK loads
+    ["init","onReady","track","options","screen"].forEach(function (m) {
+      we[m] = we[m] || function () { q.push([m].concat([].slice.call(arguments))); };
+    });
+
+    // User API stubs
+    we.user = we.user || {};
+    ["identify","login","logout","setAttribute","setAttributes","setAttributeOnce","setAttributesOnce"]
+      .forEach(function (m) {
+        we.user[m] = we.user[m] || function () { q.push(["user."+m].concat([].slice.call(arguments))); };
+      });
+
+    // Publish stub
+    w.webengage = we;
+
+    // Multi-CDN fallback (tries next host on error)
+    var hosts = [
+      "https://a-cdn.webengage.com/v3/webengage-min.js",
+      "https://cdn.webengage.com/v3/webengage-min.js",
+      "https://ssl.widgets.webengage.com/js/webengage-min-v-6.0.js" // legacy
+    ];
+    function loadNext(i) {
+      if (i >= hosts.length) return;
+      var s = d.createElement("script");
+      s.async = true;
+      s.src = hosts[i];
+      s.onerror = function () { loadNext(i + 1); };
+      d.head.appendChild(s);
     }
+    loadNext(0);
 
-    // user methods
-    w.webengage.user = w.webengage.user || {};
-    var um = ["identify","login","logout","setAttribute","setAttributes","setAttributeOnce","setAttributesOnce"];
-    for (var j=0;j<um.length;j++){
-      (function(m){
-        w.webengage.user[m] = w.webengage.user[m] || function(){
-          w.webengage._q.push(["user."+m].concat([].slice.call(arguments)));
-        };
-      })(um[j]);
-    }
-
-    // Load from alternate CDN host
-    var s = d.createElement("script");
-    s.async = true;
-    s.src = "https://a-cdn.webengage.com/v3/webengage-min.js";
-    d.head.appendChild(s);
+    // Queue init safely (do not call directly)
+    q.push(["init", "76abaa9"]); // <-- your real Site ID (already set)
   })(window, document);
-
-  // Your actual Site ID — keep this line AFTER the stub above
-  webengage.init("76abaa9");
-</script>
-
+  </script>
 </head>
 
 <body>
@@ -84,9 +92,7 @@
   <main class="wrap">
     <section class="hero">
       <h1>Make your journey personal.</h1>
-      <p id="heroCopy" data-slot="hero_copy">
-        We’ll identify you **only** if your link includes a user ID.
-      </p>
+      <p id="heroCopy" data-slot="hero_copy">We’ll identify you only if your link includes a user ID.</p>
       <div class="status" id="statusBox" aria-live="polite">
         <strong id="statusBadge">Checking…</strong>
         <span id="statusText">Looking for <code>?uid=</code> or <code>?user_id=</code> in the URL.</span>
@@ -98,13 +104,16 @@
 
     <section class="grid" aria-label="Highlights">
       <article class="card" data-slot="card_one">
-        <h3>Fast setup</h3><p>Drop-in SDK + tokenized links.</p>
+        <h3>Fast setup</h3>
+        <p>Drop-in SDK + tokenized links.</p>
       </article>
       <article class="card" data-slot="card_two">
-        <h3>Smart personalization</h3><p>Target banners and nav via segments.</p>
+        <h3>Smart personalization</h3>
+        <p>Target banners and nav via segments.</p>
       </article>
       <article class="card" data-slot="card_three">
-        <h3>Clean attribution</h3><p>Carry UTM + uid across pages.</p>
+        <h3>Clean attribution</h3>
+        <p>Carry UTM + uid across pages.</p>
       </article>
     </section>
   </main>
@@ -112,12 +121,12 @@
   <footer><div class="wrap">© <span id="y"></span> YourBrand.</div></footer>
 
   <script>
-    // --- query params & helpers ---
+    // --- Query params & helpers ---
     const params = new URLSearchParams(location.search);
     const uid = params.get("uid") || params.get("user_id") || null;
     const setStatus = (b,t)=>{ document.getElementById('statusBadge').textContent=b; document.getElementById('statusText').textContent=t; };
 
-    // Identify only if uid exists
+    // Identify only if uid exists (runs when SDK ready)
     webengage.onReady(function(){
       if (!uid) {
         setStatus("Anonymous","No user ID in URL. Skipping WebEngage login.");
@@ -127,11 +136,11 @@
         webengage.user.login(uid);
 
         // (Optional) attach UTM params as user attributes
-        ["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(k=>{
+        ["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(function(k){
           const v=params.get(k); if(v) try{ webengage.user.setAttribute(k,v); }catch(e){}
         });
 
-        try { webengage.track("Email Clickthrough", { uid, path: location.pathname }); } catch(e){}
+        try { webengage.track("Email Clickthrough", { uid: uid, path: location.pathname }); } catch(e){}
         setStatus("Identified", `Logged in as "${uid}".`);
       } catch (e) {
         setStatus("Anonymous","Tried to log in but SDK errored.");
