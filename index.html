@@ -25,21 +25,44 @@
   </style>
 
   <!-- WebEngage SDK (modern CDN) -->
-  <script>
-    var webengage;
-    !function(w,e,b,n,g){function o(e,t){e[t[t.length-1]]=function(){r.__queue.push([t.join("."),arguments])}}
-    var i,s,r=w[e],z=" ",l="init options user login logout setAttribute setAttributeOnce setAttributes setAttributesOnce track screen onReady".split(z);
-    if(r) return; i=function(){this.__queue=[];},s={}; r=w[e]=new i;
-    for(var a=0;a<l.length;a++) o(s,l[a].split(z));
-    r.__api=s; r.__queue=[]; r.__version="6.0"; r.__loaded=!1;
-    var d=document.createElement("script"); d.type="text/javascript"; d.async=!0;
-    d.src="https://cdn.webengage.com/v3/webengage-min.js";
-    var n0=document.getElementsByTagName("script")[0]; n0.parentNode.insertBefore(d,n0);
-    r.__init_time=(new Date).getTime();
-  }(window,"webengage");
+ <script>
+  // Minimal, robust WebEngage loader (creates methods before network load)
+  (function(w,d){
+    w.webengage = w.webengage || {};
+    w.webengage._q = w.webengage._q || [];
 
-  webengage.init("76abaa9"); /* <-- keep your real Site ID */
-  </script>
+    // top-level methods
+    var methods = ["init","onReady","track","options","screen"];
+    for (var i=0;i<methods.length;i++){
+      (function(m){
+        w.webengage[m] = w.webengage[m] || function(){
+          w.webengage._q.push([m].concat([].slice.call(arguments)));
+        };
+      })(methods[i]);
+    }
+
+    // user methods
+    w.webengage.user = w.webengage.user || {};
+    var um = ["identify","login","logout","setAttribute","setAttributes","setAttributeOnce","setAttributesOnce"];
+    for (var j=0;j<um.length;j++){
+      (function(m){
+        w.webengage.user[m] = w.webengage.user[m] || function(){
+          w.webengage._q.push(["user."+m].concat([].slice.call(arguments)));
+        };
+      })(um[j]);
+    }
+
+    // Load from alternate CDN host
+    var s = d.createElement("script");
+    s.async = true;
+    s.src = "https://a-cdn.webengage.com/v3/webengage-min.js";
+    d.head.appendChild(s);
+  })(window, document);
+
+  // Your actual Site ID — keep this line AFTER the stub above
+  webengage.init("76abaa9");
+</script>
+
 </head>
 
 <body>
