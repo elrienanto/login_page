@@ -4,37 +4,166 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Your Brand — Landing</title>
-  <meta name="description" content="Simple landing page with direct WebEngage SDK integration and UID-based identification." />
+  <meta
+    name="description"
+    content="Simple landing page with WebEngage GTM integration and UID-based identification."
+  />
+
   <style>
-    :root{--bg:#0b1220;--border:#1f2937;--text:#e2e8f0;--muted:#94a3b8;--accent:#60a5fa;}
-    *{box-sizing:border-box} body{margin:0;background:#0b1220;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{position:sticky;top:0;background:rgba(10,15,26,.7);backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid var(--border);z-index:10}
-    nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{font-weight:700}
-    .menu{display:flex;gap:16px;flex-wrap:wrap}
-    .menu a{padding:10px 12px;border-radius:10px;color:var(--muted)}
-    .menu a:hover{background:#11192d;color:#e5ecf7}
-    .hero{padding:56px 0 20px}
-    .hero h1{margin:0 0 10px;font-size:36px}
-    .hero p{margin:0;color:var(--muted)}
-    .status{margin-top:16px;display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border:1px dashed #20304f;border-radius:10px}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
-    .card{background:linear-gradient(180deg,#0f172a,#0c1427);border:1px solid var(--border);border-radius:16px;padding:18px}
-    .card h3{margin:0 0 6px;font-size:16px}
-    .card p{margin:0;color:var(--muted);font-size:14px}
-    .btn{border:none;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:600}
-    .btn-primary{background:var(--accent);color:#08101f}
-    footer{border-top:1px solid var(--border);margin-top:30px;padding:20px 0;color:var(--muted);font-size:14px}
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} .hero{padding-top:36px} }
+    :root{
+      --bg:#0b1220;
+      --border:#1f2937;
+      --text:#e2e8f0;
+      --muted:#94a3b8;
+      --accent:#60a5fa;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      background:#0b1220;
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      background:rgba(10,15,26,.7);
+      backdrop-filter:saturate(120%) blur(6px);
+      border-bottom:1px solid var(--border);
+      z-index:10;
+    }
+
+    nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+    }
+
+    .brand{
+      font-weight:700;
+    }
+
+    .menu{
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .menu a{
+      padding:10px 12px;
+      border-radius:10px;
+      color:var(--muted);
+    }
+
+    .menu a:hover{
+      background:#11192d;
+      color:#e5ecf7;
+    }
+
+    .hero{
+      padding:56px 0 20px;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size:36px;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    .status{
+      margin-top:16px;
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border:1px dashed #20304f;
+      border-radius:10px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+      margin:28px 0;
+    }
+
+    .card{
+      background:linear-gradient(180deg,#0f172a,#0c1427);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+    }
+
+    .card h3{
+      margin:0 0 6px;
+      font-size:16px;
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .btn-primary{
+      background:var(--accent);
+      color:#08101f;
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      margin-top:30px;
+      padding:20px 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    @media (max-width:900px){
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .hero{
+        padding-top:36px;
+      }
+    }
   </style>
 
-  <!-- Resilient WebEngage loader: stubs + multi-CDN fallback -->
-  <script id='_webengage_script_tag' type='text/javascript'>
-                                    var webengage;!function(w,e,b,n,g){function o(e,t){e[t[t.length-1]]=function(){r.__queue.push([t.join("."),
-                                    arguments])}}var i,s,r=w[b],z=" ",l="init options track screen onReady".split(z),a="webPersonalization feedback survey notification notificationInbox".split(z),c="options render clear abort".split(z),p="Prepare Render Open Close Submit Complete View Click".split(z),u="identify login logout setAttribute".split(z);if(!r||!r.__v){for(w[b]=r={__queue:[],__v:"6.0",user:{}},i=0;i < l.length;i++)o(r,[l[i]]);for(i=0;i < a.length;i++){for(r[a[i]]={},s=0;s < c.length;s++)o(r[a[i]],[a[i],c[s]]);for(s=0;s < p.length;s++)o(r[a[i]],[a[i],"on"+p[s]])}for(i=0;i < u.length;i++)o(r.user,["user",u[i]]);setTimeout(function(){var f=e.createElement("script"),d=e.getElementById("_webengage_script_tag");f.type="text/javascript",f.async=!0,f.src=("https:"==e.location.protocol?"https://ssl.widgets.webengage.com":"http://cdn.widgets.webengage.com")+"/js/webengage-min-v-6.0.js",d.parentNode.insertBefore(f,d)})}}(window,document,"webengage");webengage.init("76abaa9");
-                                    </script>
+  <!--
+    IMPORTANT:
+    WebEngage is loaded via Google Tag Manager.
+    Do NOT include webengage.init() or the SDK loader here.
+  -->
+
 </head>
 
 <body>
@@ -61,9 +190,49 @@
         <strong id="statusBadge">Checking…</strong>
         <span id="statusText">Looking for <code>?uid=</code> or <code>?user_id=</code> in the URL.</span>
       </div>
-      <div style="margin-top:14px;">
-        <button id="goSub" class="btn btn-primary" type="button">Go to Subscription</button>
-      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+
+  <button id="goSub" class="btn btn-primary" type="button">
+    Go to Subscription
+  </button>
+
+  <button id="getLuid" class="btn" type="button">
+    Get LUID
+  </button>
+
+  <button id="generateLink" class="btn" type="button">
+    Generate Link
+  </button>
+
+  <button id="copyLink" class="btn" type="button">
+    Copy Link
+  </button>
+
+</div>
+
+<div style="margin-top:20px;max-width:800px;">
+
+  <p>
+    <strong>Current LUID:</strong>
+    <span id="luidText">-</span>
+  </p>
+
+  <input
+    id="generatedUrl"
+    type="text"
+    readonly
+    style="
+      width:100%;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #1f2937;
+      background:#11192d;
+      color:white;
+    "
+    placeholder="Generated URL will appear here"
+  />
+
+</div>
     </section>
 
     <section class="grid" aria-label="Highlights">
@@ -84,43 +253,279 @@
 
   <footer><div class="wrap">© <span id="y"></span> YourBrand.</div></footer>
 
-  <script>
-    // --- Query params & helpers ---
-    const params = new URLSearchParams(location.search);
-    const uid = params.get("uid") || params.get("user_id") || null;
-    const setStatus = (b,t)=>{ document.getElementById('statusBadge').textContent=b; document.getElementById('statusText').textContent=t; };
+ <script>
 
-    // Identify only if uid exists (runs when SDK ready)
-    webengage.onReady(function(){
-      if (!uid) {
-        setStatus("Anonymous","No user ID in URL. Skipping WebEngage login.");
-        return;
+  // --------------------------------------------------
+  // Query Params & Helpers
+  // --------------------------------------------------
+
+  const params = new URLSearchParams(location.search);
+
+  const uid =
+    params.get("uid") ||
+    params.get("user_id") ||
+    null;
+
+  let currentLuid = null;
+
+  const setStatus = (badge, text) => {
+    document.getElementById("statusBadge").textContent = badge;
+    document.getElementById("statusText").textContent = text;
+  };
+
+  // --------------------------------------------------
+  // Wait until GTM has loaded WebEngage
+  // --------------------------------------------------
+
+  function waitForWebEngage(callback) {
+
+    const timer = setInterval(() => {
+
+      if (
+        window.webengage &&
+        webengage.__loaded &&
+        typeof webengage.onReady === "function"
+      ) {
+
+        clearInterval(timer);
+
+        callback();
+
       }
+
+    }, 200);
+
+  }
+
+  // --------------------------------------------------
+  // Login
+  // --------------------------------------------------
+
+  waitForWebEngage(function () {
+
+    webengage.onReady(function () {
+
+      if (!uid) {
+
+        setStatus(
+          "Anonymous",
+          "No user ID in URL. Skipping WebEngage login."
+        );
+
+        return;
+
+      }
+
       try {
+
         webengage.user.login(uid);
 
-        // (Optional) attach UTM params as user attributes
-        ["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(function(k){
-          const v=params.get(k); if(v) try{ webengage.user.setAttribute(k,v); }catch(e){}
+        [
+          "utm_source",
+          "utm_medium",
+          "utm_campaign",
+          "utm_term",
+          "utm_content"
+        ].forEach(function (key) {
+
+          const value = params.get(key);
+
+          if (value) {
+
+            try {
+
+              webengage.user.setAttribute(key, value);
+
+            } catch (e) {}
+
+          }
+
         });
 
-        try { webengage.track("Email Clickthrough", { uid: uid, path: location.pathname }); } catch(e){}
-        setStatus("Identified", `Logged in as "${uid}".`);
-      } catch (e) {
-        setStatus("Anonymous","Tried to log in but SDK errored.");
-        console.warn("WebEngage login error:", e);
+        try {
+
+          webengage.track(
+            "Email Clickthrough",
+            {
+              uid: uid,
+              path: location.pathname
+            }
+          );
+
+        } catch (e) {}
+
+        setStatus(
+          "Identified",
+          `Logged in as "${uid}".`
+        );
+
       }
+
+      catch (e) {
+
+        console.warn("WebEngage login error:", e);
+
+        setStatus(
+          "Anonymous",
+          "Tried to log in but SDK errored."
+        );
+
+      }
+
     });
 
-    // Carry params to subscription page
-    document.getElementById("goSub").addEventListener("click", ()=>{
-      const dest = new URL("https://elrienanto.github.io/subscription_page");
+  });
+
+  // --------------------------------------------------
+  // Subscription Page
+  // --------------------------------------------------
+
+  document
+    .getElementById("goSub")
+    .addEventListener("click", () => {
+
+      const dest = new URL(
+        "https://elrienanto.github.io/subscription_page"
+      );
+
       dest.search = params.toString();
-      try { webengage.track("Subscription CTA Clicked", { uid: uid || null }); } catch(e){}
+
+      try {
+
+        webengage.track(
+          "Subscription CTA Clicked",
+          {
+            uid: uid || null
+          }
+        );
+
+      } catch (e) {}
+
       location.href = dest.toString();
+
     });
 
-    document.getElementById("y").textContent = new Date().getFullYear();
-  </script>
+  // --------------------------------------------------
+  // Get LUID
+  // --------------------------------------------------
+
+  document
+    .getElementById("getLuid")
+    .addEventListener("click", () => {
+
+      try {
+
+        currentLuid =
+          webengage
+            .state
+            .getForever()
+            .luid;
+
+        document
+          .getElementById("luidText")
+          .textContent =
+          currentLuid;
+
+      }
+
+      catch (e) {
+
+        console.error(e);
+
+        alert("Unable to retrieve WebEngage LUID.");
+
+      }
+
+    });
+
+  // --------------------------------------------------
+  // Generate Link
+  // --------------------------------------------------
+
+  document
+    .getElementById("generateLink")
+    .addEventListener("click", () => {
+
+      if (!currentLuid) {
+
+        alert("Please click 'Get LUID' first.");
+
+        return;
+
+      }
+
+      const generated = new URL(
+        window.location.origin +
+        window.location.pathname
+      );
+
+      if (uid) {
+
+        generated.searchParams.set(
+          "user_id",
+          uid
+        );
+
+      }
+
+      generated.searchParams.set(
+        "luid",
+        currentLuid
+      );
+
+      document
+        .getElementById("generatedUrl")
+        .value =
+        generated.toString();
+
+    });
+
+  // --------------------------------------------------
+  // Copy Link
+  // --------------------------------------------------
+
+  document
+    .getElementById("copyLink")
+    .addEventListener("click", async () => {
+
+      const url =
+        document.getElementById(
+          "generatedUrl"
+        ).value;
+
+      if (!url) {
+
+        alert("Please generate the link first.");
+
+        return;
+
+      }
+
+      try {
+
+        await navigator.clipboard.writeText(url);
+
+        alert("Copied!");
+
+      }
+
+      catch (e) {
+
+        console.error(e);
+
+        alert("Unable to copy URL.");
+
+      }
+
+    });
+
+  // --------------------------------------------------
+  // Footer Year
+  // --------------------------------------------------
+
+  document.getElementById("y").textContent =
+    new Date().getFullYear();
+
+</script>
 </body>
 </html>
