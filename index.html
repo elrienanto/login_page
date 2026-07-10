@@ -130,16 +130,25 @@ let currentLuid = null;
 
     // Identify only if uid exists (runs when SDK ready)
    webengage.onReady(function(){
+     console.log("onReady fired");
 
   // Read the current browser LUID
   try {
 
-    currentLuid = webengage.state.getForever().luid;
+    const forever = webengage.state.getForever();
 
-    console.log("Current LUID:", currentLuid);
+console.log("Forever:", forever);
+
+currentLuid = forever.luid;
+
+console.log("Current LUID:", currentLuid);
+    
 
     document.getElementById("luidText").textContent =
       currentLuid;
+    console.log(
+    document.getElementById("luidText").textContent
+);
 
   } catch(e){
 
