@@ -60,10 +60,45 @@
       <div class="status" id="statusBox" aria-live="polite">
         <strong id="statusBadge">Checking…</strong>
         <span id="statusText">Looking for <code>?uid=</code> or <code>?user_id=</code> in the URL.</span>
-      </div>
-      <div style="margin-top:14px;">
-        <button id="goSub" class="btn btn-primary" type="button">Go to Subscription</button>
-      </div>
+      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+
+  <button id="goSub" class="btn btn-primary" type="button">
+    Go to Subscription
+  </button>
+
+  <button id="generateLink" class="btn" type="button">
+    Generate LUID Link
+  </button>
+
+  <button id="copyLink" class="btn" type="button">
+    Copy Link
+  </button>
+
+</div>
+
+<div style="margin-top:20px;max-width:900px;">
+
+  <p>
+    <strong>Current LUID:</strong>
+    <span id="luidText">Loading...</span>
+  </p>
+
+  <input
+    id="generatedUrl"
+    type="text"
+    readonly
+    style="
+      width:100%;
+      padding:10px;
+      border-radius:10px;
+      border:1px solid #1f2937;
+      background:#11192d;
+      color:white;
+    "
+    placeholder="Generated URL will appear here"
+  />
+
+</div>
     </section>
 
     <section class="grid" aria-label="Highlights">
@@ -87,11 +122,34 @@
   <script>
     // --- Query params & helpers ---
     const params = new URLSearchParams(location.search);
-    const uid = params.get("uid") || params.get("user_id") || null;
+    const params = new URLSearchParams(location.search);
+const uid = params.get("uid") || params.get("user_id") || null;
+
+let currentLuid = null;
     const setStatus = (b,t)=>{ document.getElementById('statusBadge').textContent=b; document.getElementById('statusText').textContent=t; };
 
     // Identify only if uid exists (runs when SDK ready)
-    webengage.onReady(function(){
+   webengage.onReady(function(){
+
+  // Read the current browser LUID
+  try {
+
+    currentLuid = webengage.state.getForever().luid;
+
+    console.log("Current LUID:", currentLuid);
+
+    document.getElementById("luidText").textContent =
+      currentLuid;
+
+  } catch(e){
+
+    console.warn("Unable to read LUID", e);
+
+    document.getElementById("luidText").textContent =
+      "Unavailable";
+
+  }
+      
       if (!uid) {
         setStatus("Anonymous","No user ID in URL. Skipping WebEngage login.");
         return;
@@ -119,6 +177,55 @@
       try { webengage.track("Subscription CTA Clicked", { uid: uid || null }); } catch(e){}
       location.href = dest.toString();
     });
+    // --------------------------------------------------
+// Generate LUID URL
+// --------------------------------------------------
+
+document.getElementById("generateLink").addEventListener("click", () => {
+
+  if (!currentLuid) {
+
+    alert("LUID is not available.");
+
+    return;
+
+  }
+
+  const generated = new URL(window.location.href);
+
+  // Keep existing query params
+  generated.search = params.toString();
+
+  // Add the LUID
+  generated.searchParams.set("luid", currentLuid);
+
+  document.getElementById("generatedUrl").value =
+    generated.toString();
+
+});
+
+// --------------------------------------------------
+// Copy URL
+// --------------------------------------------------
+
+document.getElementById("copyLink").addEventListener("click", async () => {
+
+  const input =
+    document.getElementById("generatedUrl");
+
+  if (!input.value) {
+
+    alert("Generate the URL first.");
+
+    return;
+
+  }
+
+  await navigator.clipboard.writeText(input.value);
+
+  alert("Copied!");
+
+});
 
     document.getElementById("y").textContent = new Date().getFullYear();
   </script>
