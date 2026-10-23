@@ -199,6 +199,34 @@
     const uid = params.get("uid") || params.get("user_id") || null;
     let currentLuid = null;
 
+    function refreshLuidDisplay() {
+      try {
+        if (!window.webengage || !webengage.state ||
+            typeof webengage.state.getForever !== "function") {
+          console.warn("WebEngage state.getForever is not available yet.");
+          document.getElementById("luidText").textContent = "SDK state not ready";
+          return null;
+        }
+
+        const forever = webengage.state.getForever();
+        console.log("WebEngage Forever state:", forever);
+
+        // The documented/current site implementation reads the LUID from forever.luid.
+        const luid = forever && typeof forever.luid === "string"
+          ? forever.luid.trim()
+          : "";
+
+        currentLuid = luid || null;
+        document.getElementById("luidText").textContent = currentLuid || "LUID not available yet";
+        console.log("Current WebEngage LUID:", currentLuid);
+        return currentLuid;
+      } catch (error) {
+        console.warn("Unable to fetch WebEngage LUID:", error);
+        document.getElementById("luidText").textContent = "Unable to read LUID (see console)";
+        return null;
+      }
+    }
+
     const setStatus = (badge, text) => {
       document.getElementById("statusBadge").textContent = badge;
       document.getElementById("statusText").textContent = text;
@@ -207,15 +235,10 @@
     webengage.onReady(async function () {
       console.log("WebEngage onReady fired");
 
-      try {
-        const forever = webengage.state.getForever();
-        console.log("WebEngage Forever:", forever);
-        currentLuid = forever && forever.luid ? forever.luid : null;
-        document.getElementById("luidText").textContent = currentLuid || "Unavailable";
-      } catch (error) {
-        console.warn("Unable to read LUID:", error);
-        document.getElementById("luidText").textContent = "Unavailable";
-      }
+      refreshLuidDisplay();
+      // SDK state may populate shortly after onReady; retry a couple of times.
+      window.setTimeout(refreshLuidDisplay, 1000);
+      window.setTimeout(refreshLuidDisplay, 3000);
 
       if (uid) {
         document.getElementById("cuidInput").value = uid;
@@ -294,14 +317,27 @@
     });
 
     document.getElementById("generateLink").addEventListener("click", function () {
-      if (!currentLuid) {
-        alert("LUID is not available yet. Wait for the SDK to initialize and try again.");
+      // Read the latest LUID at click time instead of relying only on the onReady value.
+      const luid = refreshLuidDisplay() || currentLuid;
+      if (!luid) {
+        alert("WebEngage has not returned a LUID yet. Wait a few seconds, then click Generate LUID Link again. If it still fails, check the console for 'WebEngage Forever state'.");
         return;
       }
+
       const generated = new URL(window.location.href);
-      generated.search = params.toString();
-      generated.searchParams.set("luid", currentLuid);
+      // Preserve the current query parameters and add/replace only the LUID.
+      generated.searchParams.set("luid", luid);
+
+      // If the user logged in using the form and the page URL has no uid/user_id,
+      // include the authenticated CUID so the generated link retains the identity.
+      const currentUid = generated.searchParams.get("uid") || generated.searchParams.get("user_id");
+      const cuidField = document.getElementById("cuidInput");
+      if (!currentUid && cuidField && cuidField.value.trim()) {
+        generated.searchParams.set("uid", cuidField.value.trim());
+      }
+
       document.getElementById("generatedUrl").value = generated.toString();
+      console.log("Generated LUID URL:", generated.toString());
     });
 
     document.getElementById("copyLink").addEventListener("click", async function () {
