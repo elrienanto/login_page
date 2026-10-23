@@ -132,21 +132,6 @@
         <span id="statusText">Looking for ?uid= or ?user_id= in the URL.</span>
       </div>
 
-      <section class="card" style="margin-top:20px;max-width:700px;" aria-labelledby="loginHeading">
-        <h2 id="loginHeading" style="margin-top:0;">Test Login (JWT)</h2>
-        <p>Enter a WebEngage CUID and the test secret configured in Vercel. The secret is sent only to this site's /api/token endpoint.</p>
-        <form id="loginForm">
-          <label for="cuidInput">User ID / CUID</label>
-          <input id="cuidInput" class="field" name="cuid" type="text" autocomplete="username" required maxlength="200" placeholder="e.g. reo@mailer.com" />
-          <label for="testSecretInput" style="display:block;margin-top:12px;">Test secret</label>
-          <input id="testSecretInput" class="field" name="testSecret" type="password" autocomplete="current-password" required placeholder="Enter TEST_LOGIN_SECRET" />
-          <div class="button-row">
-            <button id="loginButton" class="btn btn-primary" type="submit">Login with JWT</button>
-          </div>
-        </form>
-        <p id="loginStatus" aria-live="polite" style="margin-top:12px;">Not logged in through this form yet.</p>
-      </section>
-
       <div class="button-row">
         <button id="goSub" class="btn btn-primary" type="button">Go to Subscription</button>
         <button id="generateLink" class="btn" type="button">Generate LUID Link</button>
@@ -173,6 +158,23 @@
       </div>
     </section>
 
+
+    <section class="card" style="margin:20px 0;" aria-labelledby="jwtLoginTitle">
+      <h2 id="jwtLoginTitle">Test SDK Authentication</h2>
+      <p>Enter your CUID and the test secret configured in Vercel as <code>TEST_LOGIN_SECRET</code>.</p>
+      <form id="loginForm">
+        <label for="cuidInput">CUID / User ID</label>
+        <input id="cuidInput" name="cuid" type="text" autocomplete="username" required maxlength="200"
+          placeholder="e.g. reo@mailer.com" style="display:block;width:100%;padding:10px;margin:6px 0 14px;background:#11192d;color:white;border:1px solid #1f2937;border-radius:10px;" />
+        <label for="testSecretInput">TEST_LOGIN_SECRET</label>
+        <input id="testSecretInput" name="testSecret" type="password" autocomplete="off" required
+          placeholder="Enter Vercel test secret" style="display:block;width:100%;padding:10px;margin:6px 0 14px;background:#11192d;color:white;border:1px solid #1f2937;border-radius:10px;" />
+        <button id="loginButton" class="btn btn-primary" type="submit">Login with JWT</button>
+        <button id="logoutButton" class="btn" type="button">Logout</button>
+      </form>
+      <p id="loginStatus" aria-live="polite">Not logged in through this form yet.</p>
+    </section>
+
     <section class="grid" aria-label="Highlights">
       <article class="card" data-slot="card_one">
         <h3>Fast setup</h3>
@@ -192,122 +194,112 @@
   <footer><div class="wrap">© <span id="y"></span> YourBrand.</div></footer>
 
   <script>
-    // --- URL UID, JWT login, and LUID helpers ---
+    // --- UID identification and LUID link helpers ---
     const params = new URLSearchParams(window.location.search);
-    const uidFromUrl = params.get("uid") || params.get("user_id") || "";
-    const cuidInput = document.getElementById("cuidInput");
-    const testSecretInput = document.getElementById("testSecretInput");
-    const loginForm = document.getElementById("loginForm");
-    const loginButton = document.getElementById("loginButton");
-    const loginStatus = document.getElementById("loginStatus");
-    let activeUid = "";
+    const uid = params.get("uid") || params.get("user_id") || null;
     let currentLuid = null;
 
-    // Prefill from URL, but do not auto-login; the user submits the login form.
-    cuidInput.value = uidFromUrl;
-    if (uidFromUrl) {
-      setStatus("Ready to login", 'User ID found in URL: "' + uidFromUrl + '". Enter the test secret and click Login with JWT.');
-    } else {
-      setStatus("Anonymous", "No uid/user_id query parameter. You can enter a CUID in the login form below.");
-    }
+    const setStatus = (badge, text) => {
+      document.getElementById("statusBadge").textContent = badge;
+      document.getElementById("statusText").textContent = text;
+    };
 
-    function refreshLuid() {
+    webengage.onReady(async function () {
+      console.log("WebEngage onReady fired");
+
       try {
-        if (!window.webengage || !webengage.state || typeof webengage.state.getForever !== "function") return false;
         const forever = webengage.state.getForever();
         console.log("WebEngage Forever:", forever);
-        const luid = forever && forever.luid ? forever.luid : null;
-        if (luid) {
-          currentLuid = luid;
-          document.getElementById("luidText").textContent = luid;
-          return true;
-        }
+        currentLuid = forever && forever.luid ? forever.luid : null;
+        document.getElementById("luidText").textContent = currentLuid || "Unavailable";
       } catch (error) {
-        console.warn("Unable to read LUID yet:", error);
+        console.warn("Unable to read LUID:", error);
+        document.getElementById("luidText").textContent = "Unavailable";
       }
-      return false;
-    }
 
-    // Read LUID after SDK readiness and retry briefly in case state initializes later.
-    webengage.onReady(function () {
-      console.log("WebEngage onReady fired");
-      if (!refreshLuid()) {
-        let attempts = 0;
-        const luidTimer = window.setInterval(function () {
-          attempts += 1;
-          if (refreshLuid() || attempts >= 20) {
-            window.clearInterval(luidTimer);
-            if (!currentLuid) document.getElementById("luidText").textContent = "Unavailable — check SDK initialization";
-          }
-        }, 500);
+      if (uid) {
+        document.getElementById("cuidInput").value = uid;
+        setStatus("SDK Ready", "User ID found in URL. Click Login with JWT to authenticate.");
+      } else {
+        setStatus("SDK Ready", "Enter a CUID and test secret, or open a URL with ?uid=...");
       }
     });
 
-    loginForm.addEventListener("submit", async function (event) {
+
+    // Manual JWT login: the API must validate TEST_LOGIN_SECRET server-side.
+    document.getElementById("loginForm").addEventListener("submit", async function (event) {
       event.preventDefault();
-      const cuid = cuidInput.value.trim();
-      const testSecret = testSecretInput.value;
+      const cuid = document.getElementById("cuidInput").value.trim();
+      const testSecret = document.getElementById("testSecretInput").value;
+      const status = document.getElementById("loginStatus");
+      const button = document.getElementById("loginButton");
+
       if (!cuid || !testSecret) {
-        loginStatus.textContent = "Enter both the CUID and test secret.";
+        status.textContent = "Enter both the CUID and test secret.";
         return;
       }
 
-      loginButton.disabled = true;
-      loginStatus.textContent = "Requesting JWT from Vercel...";
-      setStatus("Authenticating", "Requesting JWT from the server...");
-
+      button.disabled = true;
+      status.textContent = "Requesting JWT from /api/token...";
       try {
         const response = await fetch("/api/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          cache: "no-store",
           body: JSON.stringify({ cuid: cuid, testSecret: testSecret })
         });
-        const result = await response.json().catch(function () { return {}; });
-        if (!response.ok) throw new Error(result.error || ("Token endpoint returned HTTP " + response.status));
-        if (!result.token || !result.cuid) throw new Error("Token endpoint response must include cuid and token.");
+        const raw = await response.text();
+        let result;
+        try { result = raw ? JSON.parse(raw) : {}; }
+        catch (_) { throw new Error("API returned non-JSON (HTTP " + response.status + ")."); }
+
+        if (!response.ok) throw new Error(result.error || ("API returned HTTP " + response.status));
+        if (!result.token || !result.cuid) throw new Error("API response must include token and cuid.");
+        if (result.cuid !== cuid) throw new Error("API returned a different CUID. Login cancelled.");
+
+        if (!window.webengage || !webengage.user || typeof webengage.user.login !== "function") {
+          throw new Error("WebEngage login API is not available yet. Wait for SDK initialization.");
+        }
 
         webengage.user.login(result.cuid, result.token);
-        activeUid = result.cuid;
-        loginStatus.textContent = 'JWT login requested for "' + result.cuid + '". Check the console and WebEngage configuration if authentication is rejected.';
-        setStatus("JWT submitted", 'Login requested for "' + result.cuid + '".');
-        testSecretInput.value = "";
-
-        ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach(function (key) {
-          const value = params.get(key);
-          if (value) {
-            try { webengage.user.setAttribute(key, value); }
-            catch (error) { console.warn("Unable to set attribute:", key, error); }
-          }
-        });
-        try {
-          webengage.track("Email Clickthrough", { uid: result.cuid, path: window.location.pathname });
-        } catch (error) { console.warn("Unable to track Email Clickthrough:", error); }
-        refreshLuid();
+        setStatus("Login submitted", 'JWT login submitted for "' + result.cuid + '".');
+        status.textContent = "API accepted the credentials and returned a JWT. The JWT was passed to WebEngage; check the console and WebEngage authentication configuration to confirm acceptance.";
+        console.log("JWT API succeeded for CUID:", result.cuid, "(token not logged)");
+        try { webengage.track("Email Clickthrough", { uid: result.cuid, path: location.pathname }); }
+        catch (e) { console.warn("Event tracking failed:", e); }
       } catch (error) {
-        loginStatus.textContent = "Login failed: " + (error.message || error);
-        setStatus("Login failed", error.message || "Could not authenticate.");
-        console.error("WebEngage JWT login error:", error);
+        status.textContent = "Login failed: " + error.message;
+        setStatus("Login failed", error.message);
+        console.error("JWT login flow failed:", error);
       } finally {
-        loginButton.disabled = false;
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", function () {
+      try {
+        webengage.user.logout();
+        document.getElementById("loginStatus").textContent = "Logout call submitted.";
+        setStatus("Logged out", "WebEngage logout call submitted.");
+      } catch (error) {
+        document.getElementById("loginStatus").textContent = "Logout failed: " + error.message;
       }
     });
 
     document.getElementById("goSub").addEventListener("click", function () {
       const destination = new URL("https://elrienanto.github.io/subscription_page");
       destination.search = params.toString();
-      try { webengage.track("Subscription CTA Clicked", { uid: activeUid || uidFromUrl || null }); } catch (error) {}
+      try { webengage.track("Subscription CTA Clicked", { uid: uid || null }); } catch (error) {}
       window.location.href = destination.toString();
     });
 
     document.getElementById("generateLink").addEventListener("click", function () {
-      if (!currentLuid) refreshLuid();
       if (!currentLuid) {
-        alert("LUID is not available yet. Check the SDK initialization and try again.");
+        alert("LUID is not available yet. Wait for the SDK to initialize and try again.");
         return;
       }
       const generated = new URL(window.location.href);
       generated.search = params.toString();
-      if (activeUid) generated.searchParams.set("uid", activeUid);
       generated.searchParams.set("luid", currentLuid);
       document.getElementById("generatedUrl").value = generated.toString();
     });
