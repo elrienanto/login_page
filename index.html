@@ -2,41 +2,107 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Your Brand — Landing</title>
-  <meta name="description" content="Simple landing page with direct WebEngage SDK integration and UID-based identification." />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Brand — WebEngage Inbox Test</title>
+  <meta name="description" content="Test page for WebEngage SDK, UID identification, LUID links, and Notification Inbox." />
   <style>
-    :root{--bg:#0b1220;--border:#1f2937;--text:#e2e8f0;--muted:#94a3b8;--accent:#60a5fa;}
-    *{box-sizing:border-box} body{margin:0;background:#0b1220;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    header{position:sticky;top:0;background:rgba(10,15,26,.7);backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid var(--border);z-index:10}
-    nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
-    .brand{font-weight:700}
-    .menu{display:flex;gap:16px;flex-wrap:wrap}
-    .menu a{padding:10px 12px;border-radius:10px;color:var(--muted)}
-    .menu a:hover{background:#11192d;color:#e5ecf7}
-    .hero{padding:56px 0 20px}
-    .hero h1{margin:0 0 10px;font-size:36px}
-    .hero p{margin:0;color:var(--muted)}
-    .status{margin-top:16px;display:inline-flex;gap:10px;align-items:center;padding:10px 12px;border:1px dashed #20304f;border-radius:10px}
-    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
-    .card{background:linear-gradient(180deg,#0f172a,#0c1427);border:1px solid var(--border);border-radius:16px;padding:18px}
-    .card h3{margin:0 0 6px;font-size:16px}
-    .card p{margin:0;color:var(--muted);font-size:14px}
-    .btn{border:none;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:600}
-    .btn-primary{background:var(--accent);color:#08101f}
-    footer{border-top:1px solid var(--border);margin-top:30px;padding:20px 0;color:var(--muted);font-size:14px}
-    @media (max-width:900px){ .grid{grid-template-columns:1fr} .hero{padding-top:36px} }
+    :root {
+      --bg: #0b1220;
+      --border: #1f2937;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --panel: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    header {
+      position: sticky; top: 0; background: rgba(10,15,26,.9);
+      backdrop-filter: saturate(120%) blur(6px);
+      border-bottom: 1px solid var(--border); z-index: 10;
+    }
+    nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { font-weight: 700; }
+    .menu { display: flex; gap: 16px; flex-wrap: wrap; }
+    .menu a { padding: 10px 12px; border-radius: 10px; color: var(--muted); }
+    .menu a:hover { background: #11192d; color: #e5ecf7; }
+    .hero { padding: 56px 0 20px; }
+    .hero h1 { margin: 0 0 10px; font-size: 36px; }
+    .hero p { color: var(--muted); }
+    .status {
+      margin-top: 16px; display: inline-flex; gap: 10px; align-items: center;
+      padding: 10px 12px; border: 1px dashed #20304f; border-radius: 10px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 28px 0; }
+    .card {
+      background: linear-gradient(180deg, #0f172a, #0c1427);
+      border: 1px solid var(--border); border-radius: 16px; padding: 18px;
+      min-width: 0;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 16px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .btn {
+      border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px;
+      cursor: pointer; font-weight: 600; background: #11192d; color: var(--text);
+    }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #08101f; }
+    .btn:disabled { opacity: .55; cursor: wait; }
+    .button-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .field {
+      width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border);
+      background: #11192d; color: white; margin-top: 8px;
+    }
+    .inbox-list { display: grid; gap: 12px; margin-top: 18px; }
+    .inbox-item { border: 1px solid #263449; border-radius: 12px; padding: 16px; background: #0b1426; }
+    .inbox-item h3 { margin: 0 0 8px; color: var(--text); }
+    .inbox-item p { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .inbox-meta { color: var(--muted); font-size: 12px; margin: 8px 0; }
+    .inbox-item details { margin-top: 12px; color: var(--muted); }
+    .inbox-item pre { white-space: pre-wrap; overflow-wrap: anywhere; color: #cbd5e1; font-size: 12px; }
+    .empty { color: var(--muted); border: 1px dashed #263449; padding: 18px; border-radius: 12px; }
+    footer { border-top: 1px solid var(--border); margin-top: 30px; padding: 20px 0; color: var(--muted); font-size: 14px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .hero { padding-top: 36px; } nav { align-items: flex-start; flex-direction: column; } }
   </style>
 
-  <!-- Resilient WebEngage loader: stubs + multi-CDN fallback -->
-  <script id='_webengage_script_tag' type='text/javascript'>
-                                    var webengage;!function(w,e,b,n,g){function o(e,t){e[t[t.length-1]]=function(){r.__queue.push([t.join("."),
-                                    arguments])}}var i,s,r=w[b],z=" ",l="init options track screen onReady".split(z),a="webPersonalization feedback survey notification notificationInbox".split(z),c="options render clear abort".split(z),p="Prepare Render Open Close Submit Complete View Click".split(z),u="identify login logout setAttribute".split(z);if(!r||!r.__v){for(w[b]=r={__queue:[],__v:"6.0",user:{}},i=0;i < l.length;i++)o(r,[l[i]]);for(i=0;i < a.length;i++){for(r[a[i]]={},s=0;s < c.length;s++)o(r[a[i]],[a[i],c[s]]);for(s=0;s < p.length;s++)o(r[a[i]],[a[i],"on"+p[s]])}for(i=0;i < u.length;i++)o(r.user,["user",u[i]]);setTimeout(function(){var f=e.createElement("script"),d=e.getElementById("_webengage_script_tag");f.type="text/javascript",f.async=!0,f.src=("https:"==e.location.protocol?"https://ssl.widgets.webengage.com":"http://cdn.widgets.webengage.com")+"/js/webengage-min-v-6.0.js",d.parentNode.insertBefore(f,d)})}}(window,document,"webengage");// Enable Safari Web Push
-webengage.options("safariWebPush", true);
-webengage.init("76abaa9");
-                                    </script>
+  <!-- WebEngage SDK loader -->
+  <script id="_webengage_script_tag" type="text/javascript">
+    var webengage;
+    !function(w,e,b,n,g){
+      function o(e,t){e[t[t.length-1]]=function(){r.__queue.push([t.join("."),arguments])}}
+      var i,s,r=w[b],z=" ",l="init options track screen onReady".split(z),
+          a="webPersonalization feedback survey notification notificationInbox".split(z),
+          c="options render clear abort".split(z),
+          p="Prepare Render Open Close Submit Complete View Click".split(z),
+          u="identify login logout setAttribute".split(z);
+      if(!r||!r.__v){
+        for(w[b]=r={__queue:[],__v:"6.0",user:{}},i=0;i<l.length;i++)o(r,[l[i]]);
+        for(i=0;i<a.length;i++){
+          for(r[a[i]]={},s=0;s<c.length;s++)o(r[a[i]],[a[i],c[s]]);
+          for(s=0;s<p.length;s++)o(r[a[i]],[a[i],"on"+p[s]]);
+        }
+        for(i=0;i<u.length;i++)o(r.user,["user",u[i]]);
+        setTimeout(function(){
+          var f=e.createElement("script"),d=e.getElementById("_webengage_script_tag");
+          f.type="text/javascript"; f.async=true;
+          f.src=(e.location.protocol==="https:" ?
+            "https://ssl.widgets.webengage.com" :
+            "http://cdn.widgets.webengage.com")+"/js/webengage-min-v-6.0.js";
+          d.parentNode.insertBefore(f,d);
+        });
+      }
+    }(window,document,"webengage");
+
+    // Existing test-site configuration
+    webengage.options("safariWebPush", true);
+    webengage.init("76abaa9");
+  </script>
 </head>
 
 <body>
@@ -59,48 +125,36 @@ webengage.init("76abaa9");
     <section class="hero">
       <h1>Make your journey personal.</h1>
       <p id="heroCopy" data-slot="hero_copy">We’ll identify you only if your link includes a user ID.</p>
+
       <div class="status" id="statusBox" aria-live="polite">
         <strong id="statusBadge">Checking…</strong>
-        <span id="statusText">Looking for <code>?uid=</code> or <code>?user_id=</code> in the URL.</span>
-      <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <span id="statusText">Looking for ?uid= or ?user_id= in the URL.</span>
+      </div>
 
-  <button id="goSub" class="btn btn-primary" type="button">
-    Go to Subscription
-  </button>
+      <div class="button-row">
+        <button id="goSub" class="btn btn-primary" type="button">Go to Subscription</button>
+        <button id="generateLink" class="btn" type="button">Generate LUID Link</button>
+        <button id="copyLink" class="btn" type="button">Copy Link</button>
+      </div>
 
-  <button id="generateLink" class="btn" type="button">
-    Generate LUID Link
-  </button>
+      <div style="margin-top:20px;max-width:900px;">
+        <p><strong>Current LUID:</strong> <span id="luidText">Loading...</span></p>
+        <label for="generatedUrl">Generated URL</label>
+        <input id="generatedUrl" class="field" type="text" readonly placeholder="Generated URL will appear here" />
+      </div>
+    </section>
 
-  <button id="copyLink" class="btn" type="button">
-    Copy Link
-  </button>
-
-</div>
-
-<div style="margin-top:20px;max-width:900px;">
-
-  <p>
-    <strong>Current LUID:</strong>
-    <span id="luidText">Loading...</span>
-  </p>
-
-  <input
-    id="generatedUrl"
-    type="text"
-    readonly
-    style="
-      width:100%;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid #1f2937;
-      background:#11192d;
-      color:white;
-    "
-    placeholder="Generated URL will appear here"
-  />
-
-</div>
+    <!-- Notification Inbox UI -->
+    <section class="card" id="notificationInbox" aria-labelledby="inboxHeading">
+      <h2 id="inboxHeading" style="margin-top:0;">Notification Inbox</h2>
+      <p id="inboxStatus" aria-live="polite">Click “Load Inbox” to retrieve notifications for the identified user.</p>
+      <div class="button-row">
+        <button class="btn btn-primary" id="loadInbox" type="button">Load Inbox</button>
+        <span id="unreadCount" style="align-self:center;color:var(--muted);">Unread: —</span>
+      </div>
+      <div id="inboxMessages" class="inbox-list">
+        <div class="empty">Notifications will appear here.</div>
+      </div>
     </section>
 
     <section class="grid" aria-label="Highlights">
@@ -122,123 +176,274 @@ webengage.init("76abaa9");
   <footer><div class="wrap">© <span id="y"></span> YourBrand.</div></footer>
 
   <script>
-    // --- Query params & helpers ---
-    const params = new URLSearchParams(location.search);
-    
-const uid = params.get("uid") || params.get("user_id") || null;
+    // --- UID identification and LUID link helpers ---
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get("uid") || params.get("user_id") || null;
+    let currentLuid = null;
 
-let currentLuid = null;
-    const setStatus = (b,t)=>{ document.getElementById('statusBadge').textContent=b; document.getElementById('statusText').textContent=t; };
+    const setStatus = (badge, text) => {
+      document.getElementById("statusBadge").textContent = badge;
+      document.getElementById("statusText").textContent = text;
+    };
 
-    // Identify only if uid exists (runs when SDK ready)
-   webengage.onReady(function(){
-     console.log("onReady fired");
+    webengage.onReady(function () {
+      console.log("WebEngage onReady fired");
 
-  // Read the current browser LUID
-  try {
+      try {
+        const forever = webengage.state.getForever();
+        console.log("WebEngage Forever:", forever);
+        currentLuid = forever && forever.luid ? forever.luid : null;
+        document.getElementById("luidText").textContent = currentLuid || "Unavailable";
+      } catch (error) {
+        console.warn("Unable to read LUID:", error);
+        document.getElementById("luidText").textContent = "Unavailable";
+      }
 
-    const forever = webengage.state.getForever();
-
-console.log("Forever:", forever);
-
-currentLuid = forever.luid;
-
-console.log("Current LUID:", currentLuid);
-    
-
-    document.getElementById("luidText").textContent =
-      currentLuid;
-    console.log(
-    document.getElementById("luidText").textContent
-);
-
-  } catch(e){
-
-    console.warn("Unable to read LUID", e);
-
-    document.getElementById("luidText").textContent =
-      "Unavailable";
-
-  }
-      
       if (!uid) {
-        setStatus("Anonymous","No user ID in URL. Skipping WebEngage login.");
+        setStatus("Anonymous", "No user ID in URL. Skipping WebEngage login.");
         return;
       }
+
       try {
         webengage.user.login(uid);
 
-        // (Optional) attach UTM params as user attributes
-        ["utm_source","utm_medium","utm_campaign","utm_term","utm_content"].forEach(function(k){
-          const v=params.get(k); if(v) try{ webengage.user.setAttribute(k,v); }catch(e){}
+        ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach(function (key) {
+          const value = params.get(key);
+          if (value) {
+            try { webengage.user.setAttribute(key, value); } catch (error) {
+              console.warn("Unable to set attribute:", key, error);
+            }
+          }
         });
 
-        try { webengage.track("Email Clickthrough", { uid: uid, path: location.pathname }); } catch(e){}
-        setStatus("Identified", `Logged in as "${uid}".`);
-      } catch (e) {
-        setStatus("Anonymous","Tried to log in but SDK errored.");
-        console.warn("WebEngage login error:", e);
+        try {
+          webengage.track("Email Clickthrough", { uid: uid, path: window.location.pathname });
+        } catch (error) {
+          console.warn("Unable to track Email Clickthrough:", error);
+        }
+
+        setStatus("Identified", 'Logged in as "' + uid + '".');
+      } catch (error) {
+        setStatus("Anonymous", "Tried to log in but the SDK errored.");
+        console.warn("WebEngage login error:", error);
       }
     });
 
-    // Carry params to subscription page
-    document.getElementById("goSub").addEventListener("click", ()=>{
-      const dest = new URL("https://elrienanto.github.io/subscription_page");
-      dest.search = params.toString();
-      try { webengage.track("Subscription CTA Clicked", { uid: uid || null }); } catch(e){}
-      location.href = dest.toString();
+    document.getElementById("goSub").addEventListener("click", function () {
+      const destination = new URL("https://elrienanto.github.io/subscription_page");
+      destination.search = params.toString();
+      try { webengage.track("Subscription CTA Clicked", { uid: uid || null }); } catch (error) {}
+      window.location.href = destination.toString();
     });
-    // --------------------------------------------------
-// Generate LUID URL
-// --------------------------------------------------
 
-document.getElementById("generateLink").addEventListener("click", () => {
+    document.getElementById("generateLink").addEventListener("click", function () {
+      if (!currentLuid) {
+        alert("LUID is not available yet. Wait for the SDK to initialize and try again.");
+        return;
+      }
+      const generated = new URL(window.location.href);
+      generated.search = params.toString();
+      generated.searchParams.set("luid", currentLuid);
+      document.getElementById("generatedUrl").value = generated.toString();
+    });
 
-  if (!currentLuid) {
-
-    alert("LUID is not available.");
-
-    return;
-
-  }
-
-  const generated = new URL(window.location.href);
-
-  // Keep existing query params
-  generated.search = params.toString();
-
-  // Add the LUID
-  generated.searchParams.set("luid", currentLuid);
-
-  document.getElementById("generatedUrl").value =
-    generated.toString();
-
-});
-
-// --------------------------------------------------
-// Copy URL
-// --------------------------------------------------
-
-document.getElementById("copyLink").addEventListener("click", async () => {
-
-  const input =
-    document.getElementById("generatedUrl");
-
-  if (!input.value) {
-
-    alert("Generate the URL first.");
-
-    return;
-
-  }
-
-  await navigator.clipboard.writeText(input.value);
-
-  alert("Copied!");
-
-});
+    document.getElementById("copyLink").addEventListener("click", async function () {
+      const input = document.getElementById("generatedUrl");
+      if (!input.value) {
+        alert("Generate the URL first.");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(input.value);
+        alert("Copied!");
+      } catch (error) {
+        input.focus();
+        input.select();
+        alert("Clipboard access was blocked. The URL is selected; copy it manually.");
+      }
+    });
 
     document.getElementById("y").textContent = new Date().getFullYear();
+
+    // --- Notification Inbox ---
+    const loadInboxButton = document.getElementById("loadInbox");
+    const inboxStatus = document.getElementById("inboxStatus");
+    const inboxMessages = document.getElementById("inboxMessages");
+    const unreadCountLabel = document.getElementById("unreadCount");
+
+    let notifications = [];
+
+    function firstString(object, keys) {
+      if (!object || typeof object !== "object") return "";
+      for (const key of keys) {
+        if (typeof object[key] === "string" && object[key].trim()) return object[key];
+      }
+      return "";
+    }
+
+    function renderNotifications(items) {
+      inboxMessages.replaceChildren();
+
+      if (!items.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "No notifications were returned for this user.";
+        inboxMessages.appendChild(empty);
+        return;
+      }
+
+      items.forEach(function (notification, index) {
+        const item = document.createElement("article");
+        item.className = "inbox-item";
+
+        const message = notification && notification.message && typeof notification.message === "object"
+          ? notification.message
+          : notification;
+
+        const title = firstString(message, ["title", "heading", "subject", "name"]);
+        const body = firstString(message, ["body", "description", "message", "content", "summary"]);
+        const statusValue = firstString(notification, ["status", "readStatus", "channelType", "category"]);
+
+        const heading = document.createElement("h3");
+        heading.textContent = title || ("Notification " + (index + 1));
+        item.appendChild(heading);
+
+        const bodyElement = document.createElement("p");
+        bodyElement.textContent = body || "No standard title/body fields detected. Expand raw data to inspect the response.";
+        item.appendChild(bodyElement);
+
+        if (statusValue) {
+          const meta = document.createElement("div");
+          meta.className = "inbox-meta";
+          meta.textContent = "Status / type: " + statusValue;
+          item.appendChild(meta);
+        }
+
+        const details = document.createElement("details");
+        const summary = document.createElement("summary");
+        summary.textContent = "Show raw notification data";
+        const pre = document.createElement("pre");
+        try {
+          pre.textContent = JSON.stringify(notification, function (key, value) {
+            // Avoid trying to serialize function internals.
+            return typeof value === "function" ? "[Function]" : value;
+          }, 2);
+        } catch (error) {
+          pre.textContent = String(notification);
+        }
+        details.append(summary, pre);
+        item.appendChild(details);
+
+        const actions = document.createElement("div");
+        actions.className = "button-row";
+
+        if (notification && typeof notification.read === "function") {
+          const readButton = document.createElement("button");
+          readButton.className = "btn";
+          readButton.type = "button";
+          readButton.textContent = "Mark as read";
+          readButton.addEventListener("click", function () {
+            try {
+              notification.read();
+              inboxStatus.textContent = "Read action sent for this notification. Reload to refresh its status.";
+            } catch (error) {
+              console.error("Notification read action failed:", error);
+              inboxStatus.textContent = "Could not mark this notification as read. See console.";
+            }
+          });
+          actions.appendChild(readButton);
+        }
+
+        if (notification && typeof notification.delete === "function") {
+          const deleteButton = document.createElement("button");
+          deleteButton.className = "btn";
+          deleteButton.type = "button";
+          deleteButton.textContent = "Delete";
+          deleteButton.addEventListener("click", function () {
+            if (!confirm("Delete this notification from the inbox?")) return;
+            try {
+              notification.delete();
+              item.remove();
+              inboxStatus.textContent = "Delete action sent.";
+            } catch (error) {
+              console.error("Notification delete action failed:", error);
+              inboxStatus.textContent = "Could not delete this notification. See console.";
+            }
+          });
+          actions.appendChild(deleteButton);
+        }
+
+        if (actions.childElementCount) item.appendChild(actions);
+        inboxMessages.appendChild(item);
+      });
+    }
+
+    function loadUnreadCount() {
+      if (!window.webengage || !webengage.notificationInbox ||
+          typeof webengage.notificationInbox.getUserNotificationCount !== "function") {
+        unreadCountLabel.textContent = "Unread: unavailable";
+        return;
+      }
+
+      try {
+        webengage.notificationInbox.getUserNotificationCount(function (count) {
+          console.log("WebEngage unread notification count:", count);
+          unreadCountLabel.textContent = "Unread: " + (count == null ? "unknown" : count);
+        });
+      } catch (error) {
+        console.error("Could not retrieve unread notification count:", error);
+        unreadCountLabel.textContent = "Unread: unavailable";
+      }
+    }
+
+    loadInboxButton.addEventListener("click", function () {
+      if (!window.webengage || !webengage.notificationInbox ||
+          typeof webengage.notificationInbox.getNotificationList !== "function") {
+        inboxStatus.textContent = "WebEngage Notification Inbox API is not available on this page.";
+        return;
+      }
+
+      loadInboxButton.disabled = true;
+      inboxStatus.textContent = "Loading notifications...";
+      inboxMessages.replaceChildren();
+
+      let callbackFired = false;
+      const timeoutId = window.setTimeout(function () {
+        if (!callbackFired) {
+          loadInboxButton.disabled = false;
+          inboxStatus.textContent =
+            "No callback received after 10 seconds. Check SDK authentication, Inbox enablement, user identification, and the console.";
+          console.warn("Notification Inbox callback did not fire within 10 seconds.");
+        }
+      }, 10000);
+
+      try {
+        webengage.notificationInbox.getNotificationList({}, function (data) {
+          callbackFired = true;
+          window.clearTimeout(timeoutId);
+          loadInboxButton.disabled = false;
+
+          console.log("WebEngage Notification Inbox response:", data);
+
+          if (!Array.isArray(data)) {
+            inboxStatus.textContent =
+              "The callback fired, but the response is not an array. Inspect the console and raw response.";
+            console.log("Unexpected Notification Inbox response type:", typeof data, data);
+            return;
+          }
+
+          notifications = data;
+          inboxStatus.textContent = "Loaded " + notifications.length + " notification(s).";
+          renderNotifications(notifications);
+          loadUnreadCount();
+        });
+      } catch (error) {
+        window.clearTimeout(timeoutId);
+        loadInboxButton.disabled = false;
+        inboxStatus.textContent = "Error while requesting notifications: " + (error.message || error);
+        console.error("Notification Inbox request failed:", error);
+      }
+    });
   </script>
 </body>
 </html>
