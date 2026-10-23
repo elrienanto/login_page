@@ -132,6 +132,21 @@
         <span id="statusText">Looking for ?uid= or ?user_id= in the URL.</span>
       </div>
 
+      <section class="card" style="margin-top:20px;max-width:700px;" aria-labelledby="loginHeading">
+        <h2 id="loginHeading" style="margin-top:0;">Test Login (JWT)</h2>
+        <p>Enter a WebEngage CUID and the test secret configured in Vercel. The secret is sent only to this site's /api/token endpoint.</p>
+        <form id="loginForm">
+          <label for="cuidInput">User ID / CUID</label>
+          <input id="cuidInput" class="field" name="cuid" type="text" autocomplete="username" required maxlength="200" placeholder="e.g. reo@mailer.com" />
+          <label for="testSecretInput" style="display:block;margin-top:12px;">Test secret</label>
+          <input id="testSecretInput" class="field" name="testSecret" type="password" autocomplete="current-password" required placeholder="Enter TEST_LOGIN_SECRET" />
+          <div class="button-row">
+            <button id="loginButton" class="btn btn-primary" type="submit">Login with JWT</button>
+          </div>
+        </form>
+        <p id="loginStatus" aria-live="polite" style="margin-top:12px;">Not logged in through this form yet.</p>
+      </section>
+
       <div class="button-row">
         <button id="goSub" class="btn btn-primary" type="button">Go to Subscription</button>
         <button id="generateLink" class="btn" type="button">Generate LUID Link</button>
@@ -177,94 +192,122 @@
   <footer><div class="wrap">© <span id="y"></span> YourBrand.</div></footer>
 
   <script>
-    // --- UID identification and LUID link helpers ---
+    // --- URL UID, JWT login, and LUID helpers ---
     const params = new URLSearchParams(window.location.search);
-    const uid = params.get("uid") || params.get("user_id") || null;
+    const uidFromUrl = params.get("uid") || params.get("user_id") || "";
+    const cuidInput = document.getElementById("cuidInput");
+    const testSecretInput = document.getElementById("testSecretInput");
+    const loginForm = document.getElementById("loginForm");
+    const loginButton = document.getElementById("loginButton");
+    const loginStatus = document.getElementById("loginStatus");
+    let activeUid = "";
     let currentLuid = null;
 
-    const setStatus = (badge, text) => {
-      document.getElementById("statusBadge").textContent = badge;
-      document.getElementById("statusText").textContent = text;
-    };
+    // Prefill from URL, but do not auto-login; the user submits the login form.
+    cuidInput.value = uidFromUrl;
+    if (uidFromUrl) {
+      setStatus("Ready to login", 'User ID found in URL: "' + uidFromUrl + '". Enter the test secret and click Login with JWT.');
+    } else {
+      setStatus("Anonymous", "No uid/user_id query parameter. You can enter a CUID in the login form below.");
+    }
 
-    webengage.onReady(async function () {
-      console.log("WebEngage onReady fired");
-
+    function refreshLuid() {
       try {
+        if (!window.webengage || !webengage.state || typeof webengage.state.getForever !== "function") return false;
         const forever = webengage.state.getForever();
         console.log("WebEngage Forever:", forever);
-        currentLuid = forever && forever.luid ? forever.luid : null;
-        document.getElementById("luidText").textContent = currentLuid || "Unavailable";
+        const luid = forever && forever.luid ? forever.luid : null;
+        if (luid) {
+          currentLuid = luid;
+          document.getElementById("luidText").textContent = luid;
+          return true;
+        }
       } catch (error) {
-        console.warn("Unable to read LUID:", error);
-        document.getElementById("luidText").textContent = "Unavailable";
+        console.warn("Unable to read LUID yet:", error);
       }
+      return false;
+    }
 
-      if (!uid) {
-        setStatus("Anonymous", "No user ID in URL. Skipping WebEngage login.");
+    // Read LUID after SDK readiness and retry briefly in case state initializes later.
+    webengage.onReady(function () {
+      console.log("WebEngage onReady fired");
+      if (!refreshLuid()) {
+        let attempts = 0;
+        const luidTimer = window.setInterval(function () {
+          attempts += 1;
+          if (refreshLuid() || attempts >= 20) {
+            window.clearInterval(luidTimer);
+            if (!currentLuid) document.getElementById("luidText").textContent = "Unavailable — check SDK initialization";
+          }
+        }, 500);
+      }
+    });
+
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const cuid = cuidInput.value.trim();
+      const testSecret = testSecretInput.value;
+      if (!cuid || !testSecret) {
+        loginStatus.textContent = "Enter both the CUID and test secret.";
         return;
       }
 
-      try {
-        setStatus("Authenticating", "Requesting authentication token from the server...");
+      loginButton.disabled = true;
+      loginStatus.textContent = "Requesting JWT from Vercel...";
+      setStatus("Authenticating", "Requesting JWT from the server...");
 
-        // This test page expects /api/token to accept { cuid } and return { cuid, token }.
-        // The private key must stay on the server in Vercel environment variables.
+      try {
         const response = await fetch("/api/token", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cuid: uid })
+          body: JSON.stringify({ cuid: cuid, testSecret: testSecret })
         });
+        const result = await response.json().catch(function () { return {}; });
+        if (!response.ok) throw new Error(result.error || ("Token endpoint returned HTTP " + response.status));
+        if (!result.token || !result.cuid) throw new Error("Token endpoint response must include cuid and token.");
 
-        if (!response.ok) {
-          const errorBody = await response.json().catch(function () { return {}; });
-          throw new Error(errorBody.error || ("Token endpoint returned HTTP " + response.status));
-        }
-
-        const result = await response.json();
-        if (!result || !result.token || !result.cuid) {
-          throw new Error("Token endpoint response must include both cuid and token.");
-        }
-
-        // Authenticate the WebEngage user with the JWT returned by your Vercel backend.
         webengage.user.login(result.cuid, result.token);
+        activeUid = result.cuid;
+        loginStatus.textContent = 'JWT login requested for "' + result.cuid + '". Check the console and WebEngage configuration if authentication is rejected.';
+        setStatus("JWT submitted", 'Login requested for "' + result.cuid + '".');
+        testSecretInput.value = "";
 
         ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach(function (key) {
           const value = params.get(key);
           if (value) {
-            try { webengage.user.setAttribute(key, value); } catch (error) {
-              console.warn("Unable to set attribute:", key, error);
-            }
+            try { webengage.user.setAttribute(key, value); }
+            catch (error) { console.warn("Unable to set attribute:", key, error); }
           }
         });
-
         try {
           webengage.track("Email Clickthrough", { uid: result.cuid, path: window.location.pathname });
-        } catch (error) {
-          console.warn("Unable to track Email Clickthrough:", error);
-        }
-
-        setStatus("Identified", 'JWT login requested for "' + result.cuid + '".');
+        } catch (error) { console.warn("Unable to track Email Clickthrough:", error); }
+        refreshLuid();
       } catch (error) {
-        setStatus("Authentication failed", "Could not authenticate. Check the token endpoint and browser console.");
-        console.error("WebEngage authentication error:", error);
+        loginStatus.textContent = "Login failed: " + (error.message || error);
+        setStatus("Login failed", error.message || "Could not authenticate.");
+        console.error("WebEngage JWT login error:", error);
+      } finally {
+        loginButton.disabled = false;
       }
     });
 
     document.getElementById("goSub").addEventListener("click", function () {
       const destination = new URL("https://elrienanto.github.io/subscription_page");
       destination.search = params.toString();
-      try { webengage.track("Subscription CTA Clicked", { uid: uid || null }); } catch (error) {}
+      try { webengage.track("Subscription CTA Clicked", { uid: activeUid || uidFromUrl || null }); } catch (error) {}
       window.location.href = destination.toString();
     });
 
     document.getElementById("generateLink").addEventListener("click", function () {
+      if (!currentLuid) refreshLuid();
       if (!currentLuid) {
-        alert("LUID is not available yet. Wait for the SDK to initialize and try again.");
+        alert("LUID is not available yet. Check the SDK initialization and try again.");
         return;
       }
       const generated = new URL(window.location.href);
       generated.search = params.toString();
+      if (activeUid) generated.searchParams.set("uid", activeUid);
       generated.searchParams.set("luid", currentLuid);
       document.getElementById("generatedUrl").value = generated.toString();
     });
