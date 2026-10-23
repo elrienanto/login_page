@@ -101,6 +101,7 @@
 
     // Existing test-site configuration
     webengage.options("safariWebPush", true);
+    webengage.options("httpFetch", true);
     webengage.init("76abaa9");
   </script>
 </head>
@@ -186,7 +187,7 @@
       document.getElementById("statusText").textContent = text;
     };
 
-    webengage.onReady(function () {
+    webengage.onReady(async function () {
       console.log("WebEngage onReady fired");
 
       try {
@@ -205,7 +206,28 @@
       }
 
       try {
-        webengage.user.login(uid);
+        setStatus("Authenticating", "Requesting authentication token from the server...");
+
+        // This test page expects /api/token to accept { cuid } and return { cuid, token }.
+        // The private key must stay on the server in Vercel environment variables.
+        const response = await fetch("/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cuid: uid })
+        });
+
+        if (!response.ok) {
+          const errorBody = await response.json().catch(function () { return {}; });
+          throw new Error(errorBody.error || ("Token endpoint returned HTTP " + response.status));
+        }
+
+        const result = await response.json();
+        if (!result || !result.token || !result.cuid) {
+          throw new Error("Token endpoint response must include both cuid and token.");
+        }
+
+        // Authenticate the WebEngage user with the JWT returned by your Vercel backend.
+        webengage.user.login(result.cuid, result.token);
 
         ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"].forEach(function (key) {
           const value = params.get(key);
@@ -217,15 +239,15 @@
         });
 
         try {
-          webengage.track("Email Clickthrough", { uid: uid, path: window.location.pathname });
+          webengage.track("Email Clickthrough", { uid: result.cuid, path: window.location.pathname });
         } catch (error) {
           console.warn("Unable to track Email Clickthrough:", error);
         }
 
-        setStatus("Identified", 'Logged in as "' + uid + '".');
+        setStatus("Identified", 'JWT login requested for "' + result.cuid + '".');
       } catch (error) {
-        setStatus("Anonymous", "Tried to log in but the SDK errored.");
-        console.warn("WebEngage login error:", error);
+        setStatus("Authentication failed", "Could not authenticate. Check the token endpoint and browser console.");
+        console.error("WebEngage authentication error:", error);
       }
     });
 
